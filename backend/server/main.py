@@ -21,12 +21,16 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
-from app.static_files import BuiltAssets
+from server.static_files import BuiltAssets
 
-# На сервере раскладка такая: backend/ и static/ лежат рядом в корне сайта,
-# поэтому по умолчанию поднимаемся на уровень выше и ищем static/.
-# Локально сборка живёт в frontend/dist — переопределяется переменной.
-DEFAULT_STATIC = Path(__file__).resolve().parents[2] / "static"
+# Раскладку задаёт пресет Python ASGI на хостинге: код лежит в app/,
+# статика в www/, и оба каталога — в корне сайта. От server/main.py это
+# два уровня вверх.
+#
+# Локально сборка живёт в frontend/dist, поэтому там путь передаётся
+# переменной STATIC_DIR. На сервере переменные задаются файлами в
+# etc/environment/ — файл на переменную, имя файла и есть имя переменной.
+DEFAULT_STATIC = Path(__file__).resolve().parents[2] / "www"
 STATIC_DIR = Path(os.environ.get("STATIC_DIR", DEFAULT_STATIC))
 
 

@@ -30,7 +30,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("STATIC_DIR", str(static))
 
     # Модуль читает переменную окружения на импорте, поэтому перезагружаем
-    from app import main
+    from server import main
 
     importlib.reload(main)
     return TestClient(main.app)
