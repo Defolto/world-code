@@ -2,7 +2,7 @@
 //
 // Шаги:
 //   1. собирает фронтенд (vite build) — пропускается флагом --skip-build;
-//   2. пакует release/deploy.zip: app/ (бэкенд) и www/ (сборка фронтенда);
+//   2. пакует release/deploy.tar.gz: app/ (бэкенд) и www/ (сборка фронтенда);
 //   3. заливает архив по scp;
 //   4. по ssh заменяет app/ и www/ целиком и ставит зависимости в venv сайта;
 //   5. перезапускает сайт через API NetAngels.
@@ -21,7 +21,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
-const zipPath = path.join(root, "release", "deploy.zip");
+
+// tar.gz, а не zip. Причин две, обе выяснены на живом деплое:
+// zip умеет создавать только bsdtar (тот, что в System32), а если в PATH
+// раньше окажется GNU tar из Git Bash — он молча соберёт не тот формат;
+// и он же принимает "C:\..." за адрес удалённого хоста. tar.gz одинаково
+// делают обе версии, а на сервере распаковывается штатным tar без unzip.
+const ARCHIVE = "deploy.tar.gz";
+const archivePath = path.join(root, "release", ARCHIVE);
 
 /* ──────────────────────────── Раскладка ────────────────────────────
  *
@@ -209,12 +216,13 @@ function makeArchive() {
     });
   }
 
-  fs.rmSync(zipPath, { force: true });
-  // tar на Windows 10+ умеет zip, если у архива расширение .zip
-  run(`tar -a -cf "${zipPath}" ${REPLACED.map((d) => `"${d}"`).join(" ")}`, { cwd: staging });
+  fs.rmSync(archivePath, { force: true });
+  // Путь к архиву обязательно относительный: GNU tar принимает "C:\..."
+  // за host:path и пытается лезть по сети.
+  run(`tar -czf "../${ARCHIVE}" ${REPLACED.map((d) => `"${d}"`).join(" ")}`, { cwd: staging });
   fs.rmSync(staging, { recursive: true, force: true });
 
-  const mb = (fs.statSync(zipPath).size / 1024 / 1024).toFixed(1);
+  const mb = (fs.statSync(archivePath).size / 1024 / 1024).toFixed(1);
   console.log(`Архив собран: ${mb} МБ`);
 }
 
@@ -238,21 +246,21 @@ async function deploy() {
     `[ -d ${deployDir} ] || { echo "Нет каталога ${deployDir} на сервере"; exit 1; }`,
     `[ -x ${deployDir}/${VENV}/bin/python ] || { echo "Нет venv ${deployDir}/${VENV} — сайт создан не пресетом Python ASGI?"; exit 1; }`,
   ]);
-  run(`scp ${SSH_OPTS} "${zipPath}" ${sshTarget}:${deployDir}/deploy.zip`);
+  run(`scp ${SSH_OPTS} "${archivePath}" ${sshTarget}:${deployDir}/${ARCHIVE}`);
 
   console.log("\n=== 4/5 Разворачиваем и ставим зависимости ===");
-  // Распаковка во временную папку: если unzip упадёт, старый код цел.
+  // Распаковка во временную папку: если tar упадёт, старый код цел.
   // Каталоги подменяются переименованием — окно, в котором сайт видит
   // полурасползшийся код, сокращается до одного mv на каталог.
   remote(sshTarget, [
     `cd ${deployDir}`,
     "rm -rf .deploy_tmp .deploy_old",
     "mkdir -p .deploy_tmp .deploy_old",
-    "unzip -q deploy.zip -d .deploy_tmp",
+    `tar -xzf ${ARCHIVE} -C .deploy_tmp`,
     ...REPLACED.map(
       (dir) => `if [ -d ${dir} ]; then mv ${dir} .deploy_old/${dir}; fi && mv .deploy_tmp/${dir} ${dir}`,
     ),
-    "rm -rf .deploy_tmp .deploy_old deploy.zip",
+    `rm -rf .deploy_tmp .deploy_old ${ARCHIVE}`,
   ]);
 
   // Ставим в venv сайта, а не в свой: панель запускает приложение именно
