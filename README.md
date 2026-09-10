@@ -38,6 +38,40 @@ run(source, level, seed, loadout) -> FrameLog
 | CI | pytest: автосолвер, проверка сидов, `checksum`, гардеробная |
 | Хостинг | NetAngels, виртуальный хостинг |
 
+## Как запустить локально
+
+```bash
+# фронтенд, дев-сервер с горячей перезагрузкой
+cd frontend && npm install && npm run dev
+
+# бэкенд поверх собранного фронтенда
+cd frontend && npm run build
+cd backend
+python -m venv .venv && .venv/Scripts/python -m pip install -r requirements-dev.txt
+STATIC_DIR=../frontend/dist .venv/Scripts/python -m uvicorn asgi:app --port 8010
+
+# тесты и линт
+cd backend && .venv/Scripts/python -m pytest && .venv/Scripts/python -m ruff check .
+```
+
+## Раскладка
+
+```
+frontend/          React + Vite, сборка уезжает в frontend/dist
+backend/           ASGI-приложение
+  asgi.py          точка входа: asgi:app (он же asgi:application)
+  app/main.py      маршруты
+deploy.mjs         npm run deploy — сборка, заливка, рестарт
+```
+
+На сервере (`$DEPLOY_DIR`) `backend/` и `static/` лежат рядом и
+заменяются деплоем целиком. `.venv`, `.env` и данные приложения живут
+вне этих каталогов и деплой переживают.
+
+**Точка входа для панели хостинга** — `asgi:app` с рабочим каталогом
+`$DEPLOY_DIR/backend`. Приложение экспортирует и `app`, и `application`:
+панели разных хостеров ищут объект под разными именами.
+
 ## Две границы, которые нельзя нарушать
 
 **Симулятор существует в одном экземпляре.** Правила мира не дублируются в
