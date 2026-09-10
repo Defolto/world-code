@@ -1,0 +1,175 @@
+.demo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: var(--gap-2);
+  align-items: stretch;
+}
+
+@media (max-width: 860px) {
+  .demo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ─── Редактор ─── */
+
+.editor {
+  background: var(--bg-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-2);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-elev);
+}
+
+.tab {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.run {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--emerald);
+  border: 1px solid color-mix(in srgb, var(--emerald) 40%, transparent);
+  border-radius: 999px;
+  padding: 3px 11px;
+  white-space: nowrap;
+}
+
+.code {
+  margin: 0;
+  padding: 14px 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.85;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+  padding-inline: 14px;
+  border-left: 2px solid transparent;
+  white-space: pre;
+  color: var(--ink-dim);
+}
+
+.active {
+  background: color-mix(in srgb, var(--emerald) 11%, transparent);
+  border-left-color: var(--emerald);
+  color: var(--ink);
+}
+
+.num {
+  color: var(--ink-faint);
+  user-select: none;
+  min-width: 14px;
+  text-align: right;
+}
+
+/* ─── Мир ─── */
+
+.world {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+  min-width: 0;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tile {
+  fill: #131a24;
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.tilePath {
+  fill: #182231;
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+
+.mark {
+  fill: none;
+  stroke: color-mix(in srgb, var(--emerald) 30%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  rx: 4;
+}
+
+/* Герой */
+.cape { fill: var(--emerald-deep); }
+.legs { fill: #2b3a4e; }
+.armBack { fill: #37506c; }
+.torso { fill: #46617f; }
+.head { fill: #dcb68d; }
+.helmet { fill: #8fa4bd; }
+.arm { fill: #46617f; }
+.guard { fill: var(--gold); }
+.blade { fill: #ccd9ea; }
+
+/* Гоблин */
+.goblinSkin { fill: #6d9c46; }
+.goblinBody { fill: #47632f; }
+.eye { fill: #10151b; }
+.hpBack { fill: #2a3342; }
+.hpFill { fill: var(--crimson); }
+
+.spark {
+  fill: none;
+  stroke: #fff2c8;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Монета */
+.coinOuter { fill: var(--gold); }
+.coinInner { fill: #a8791d; }
+
+/* ─── Подпись под сценой ─── */
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  font-size: 12px;
+  color: var(--ink-dim);
+  font-family: var(--mono);
+  padding-inline: 2px;
+}
+
+.hudItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dotGold {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+}
