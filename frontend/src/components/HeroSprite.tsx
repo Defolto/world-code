@@ -17,18 +17,10 @@ type PartName = keyof typeof rig.frames;
  */
 
 /** Вырезка из атласа: вложенный svg с viewBox на нужный прямоугольник. */
-function Part({ name, dim = false }: { name: PartName; dim?: boolean }) {
+function Part({ name }: { name: PartName }) {
   const f = rig.frames[name];
   return (
-    <svg
-      x={-f.pivot[0]}
-      y={-f.pivot[1]}
-      width={f.w}
-      height={f.h}
-      viewBox={`${f.x} ${f.y} ${f.w} ${f.h}`}
-      // Задняя рука темнее передней — иначе на виде сбоку они сливаются
-      style={dim ? { filter: "brightness(0.8)" } : undefined}
-    >
+    <svg x={-f.pivot[0]} y={-f.pivot[1]} width={f.w} height={f.h} viewBox={`${f.x} ${f.y} ${f.w} ${f.h}`}>
       <image href={atlasUrl} width={rig.size[0]} height={rig.size[1]} />
     </svg>
   );
@@ -39,18 +31,16 @@ function Joint({
   name,
   jointRef,
   children,
-  dim,
 }: {
   name: PartName;
   jointRef?: RefObject<SVGGElement | null>;
   children?: React.ReactNode;
-  dim?: boolean;
 }) {
   const [ax, ay] = rig.rig[name];
   return (
     <g transform={`translate(${ax} ${ay})`}>
       <g ref={jointRef}>
-        <Part name={name} dim={dim} />
+        <Part name={name} />
         {children}
       </g>
     </g>
@@ -78,10 +68,10 @@ export function HeroSprite({ body, armFront, armBack, legFront, legBack }: HeroS
       {/* Ноги — вне наклона корпуса. Задняя рука по канону слоёв лежит
           под ногами, но её кисть под подолом всё равно не видна, а один
           наклон на две группы не повесить — упрощаем. */}
-      <Joint name="leg_back" jointRef={legBack} dim />
+      <Joint name="leg_back" jointRef={legBack} />
       <Joint name="leg_front" jointRef={legFront} />
       <g ref={body}>
-        <Joint name="arm_back" jointRef={armBack} dim />
+        <Joint name="arm_back" jointRef={armBack} />
         <Joint name="torso" />
         <Joint name="head" />
         <Joint name="arm_front" jointRef={armFront}>

@@ -131,8 +131,9 @@ export class DemoPlayer {
       const phase = Math.sin(p * Math.PI * 2);
       legAngle = -phase * 26;
       armAngle = 8 + phase * 24;
-      // Подскок на каждый шаг, то есть дважды за клетку, не один раз
-      bob = -Math.abs(Math.sin(p * Math.PI * 2)) * 1.4;
+      // Подскок на каждый шаг, то есть дважды за клетку. sin², а не |sin|:
+      // у модуля излом в нуле, и герой дёргается при каждой постановке ноги
+      bob = -(Math.sin(p * Math.PI * 2) ** 2) * 1.4;
       lean = 3;
     } else if (step.kind === "attack") {
       // Боевая стойка: ноги врозь, пока идёт замах
@@ -152,9 +153,10 @@ export class DemoPlayer {
     refs.hero.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
     refs.heroBody.setAttribute("transform", `rotate(${lean.toFixed(2)})`);
     refs.heroArm.setAttribute("transform", `rotate(${armAngle.toFixed(2)})`);
-    // Задняя рука качается зеркально передней вокруг покоя (8°), а в
-    // замахе не участвует: бьёт одна рука.
-    const armBack = step.kind === "move" ? 16 - armAngle : 8;
+    // Задняя рука — против передней, с большей амплитудой: она за торсом,
+    // и при равном махе её кисть в передней фазе не видна вовсе. В замахе
+    // не участвует: бьёт одна рука.
+    const armBack = step.kind === "move" ? 8 - (armAngle - 8) * 1.4 : 8;
     refs.heroArmBack.setAttribute("transform", `rotate(${armBack.toFixed(2)})`);
     refs.heroLegFront.setAttribute("transform", `rotate(${legAngle.toFixed(2)})`);
     refs.heroLegBack.setAttribute("transform", `rotate(${(-legAngle).toFixed(2)})`);

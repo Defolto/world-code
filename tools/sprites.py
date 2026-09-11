@@ -66,12 +66,20 @@ HEM_BELOW_HIP = 19
 LEG_SPREAD = 4
 LEG_BACK_SHIFT = -3  # ноги чуть назад: центр туники не над центром бёдер
 ARM_SPREAD = 5
+# Дальнее плечо ближе к шее, чем ближнее: в передней фазе шага кисть
+# задней руки должна выглядывать из-за груди, иначе рука видна только
+# уходящей назад и кажется, что она качается не в ту сторону.
+ARM_BACK_SPREAD = 2
 SHOULDER_BELOW_TORSO_TOP = 6
 NECK_OVERLAP = 3
 HEAD_FORWARD = 7  # лицо выступает вперёд над грудью, а не сидит по центру шеи
 
 # Порядок слоёв снизу вверх. Предмет попадает в свой слой и не спорит.
 LAYERS = ["arm_back", "leg_back", "leg_front", "torso", "head", "arm_front"]
+
+# Дальние конечности темнее ближних — иначе на виде сбоку они сливаются.
+# Запекается в атлас: CSS-фильтр на анимируемой группе дрожит по пикселям.
+DIM = {"arm_back": 0.8, "leg_back": 0.8}
 
 PAD = 2
 
@@ -183,6 +191,9 @@ def cut_sheet(path: Path) -> list[Part]:
         piece = trim(rgba[y0:y1, x0:x1])
         target_h, where = CANON[name]
         scale = target_h / piece.shape[0]
+        if name in DIM:
+            piece = piece.copy()
+            piece[..., :3] *= DIM[name]
         img = Image.fromarray(piece.astype(np.uint8), "RGBA")
         img = img.resize(
             (max(1, round(piece.shape[1] * scale)), target_h), Image.Resampling.LANCZOS
@@ -212,7 +223,7 @@ def build_rig(parts: dict[str, Part]) -> dict[str, list[float]]:
         "torso": [0.0, float(HEM_BELOW_HIP)],
         "head": [neck_dx + HEAD_FORWARD, torso_top_y + NECK_OVERLAP],
         "arm_front": [neck_dx + ARM_SPREAD, torso_top_y + SHOULDER_BELOW_TORSO_TOP],
-        "arm_back": [neck_dx - ARM_SPREAD, torso_top_y + SHOULDER_BELOW_TORSO_TOP],
+        "arm_back": [neck_dx - ARM_BACK_SPREAD, torso_top_y + SHOULDER_BELOW_TORSO_TOP],
         "leg_front": [float(LEG_BACK_SHIFT + LEG_SPREAD), 0.0],
         "leg_back": [float(LEG_BACK_SHIFT - LEG_SPREAD), 0.0],
     }
