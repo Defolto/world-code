@@ -63,6 +63,11 @@ CANON = {
 # (на эталоне видно 32 px ноги из 51). Шея и плечи считаются от торса
 # в build_rig(), потому что зависят от формы конкретной картинки.
 HEM_BELOW_HIP = 19
+# Сколько ноги оставить под подолом. Полная нога от бедра (19 px скрыто)
+# при махе на 26° выезжала верхом из-под туники сбоку, на уровне пояса —
+# казалось, что нога приделана к боку. Ось ставим ближе к подолу, лишний
+# верх обрезаем: на виде сбоку он всё равно невидим.
+LEG_HIDDEN = 8
 LEG_SPREAD = 4
 LEG_BACK_SHIFT = -3  # ноги чуть назад: центр туники не над центром бёдер
 ARM_SPREAD = 5
@@ -198,6 +203,8 @@ def cut_sheet(path: Path) -> list[Part]:
         img = img.resize(
             (max(1, round(piece.shape[1] * scale)), target_h), Image.Resampling.LANCZOS
         )
+        if name.startswith("leg_"):
+            img = img.crop((0, HEM_BELOW_HIP - LEG_HIDDEN, img.width, img.height))
         parts.append(Part(name, img, pivot_of(np.asarray(img), where)))
     return parts
 
@@ -224,8 +231,8 @@ def build_rig(parts: dict[str, Part]) -> dict[str, list[float]]:
         "head": [neck_dx + HEAD_FORWARD, torso_top_y + NECK_OVERLAP],
         "arm_front": [neck_dx + ARM_SPREAD, torso_top_y + SHOULDER_BELOW_TORSO_TOP],
         "arm_back": [neck_dx - ARM_BACK_SPREAD, torso_top_y + SHOULDER_BELOW_TORSO_TOP],
-        "leg_front": [float(LEG_BACK_SHIFT + LEG_SPREAD), 0.0],
-        "leg_back": [float(LEG_BACK_SHIFT - LEG_SPREAD), 0.0],
+        "leg_front": [float(LEG_BACK_SHIFT + LEG_SPREAD), float(HEM_BELOW_HIP - LEG_HIDDEN)],
+        "leg_back": [float(LEG_BACK_SHIFT - LEG_SPREAD), float(HEM_BELOW_HIP - LEG_HIDDEN)],
     }
 
 
