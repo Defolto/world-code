@@ -31,12 +31,13 @@ function Part({ name }: { name: PartName }) {
 /**
  * Предмет из атласа предметов, точка крепления — в начале координат.
  * Оружие в атласе стоит клинком вверх (так его рисует модель); в кисти
- * оно развёрнуто вдоль руки, клинком вниз, — поэтому rotate(180).
+ * оно смотрит вперёд, горизонтально, — поэтому rotate(90). При замахе
+ * плечо уводит его вверх и обрушивает вниз, как рубящий удар.
  */
 function Item({ name }: { name: ItemName }) {
   const f = items.frames[name];
   return (
-    <g transform={f.slot === "weapon" ? "rotate(180)" : undefined}>
+    <g transform={f.slot === "weapon" ? "rotate(90)" : undefined}>
       <svg x={-f.pivot[0]} y={-f.pivot[1]} width={f.w} height={f.h} viewBox={`${f.x} ${f.y} ${f.w} ${f.h}`}>
         <image href={itemsUrl} width={items.size[0]} height={items.size[1]} />
       </svg>
