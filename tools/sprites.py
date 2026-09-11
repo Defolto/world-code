@@ -53,9 +53,11 @@ CELL = 160
 SHEET_ORDER = ["head", "torso", "arm_front", "arm_back", "leg_front", "leg_back"]
 
 # Целевая высота части и где у неё точка крепления: "top" — центр верхнего
-# непрозрачного ряда (плечо, бедро), "bottom" — центр нижнего (шея, подол).
+# непрозрачного ряда (плечо, бедро), "bottom" — центр нижнего (подол),
+# "neck" — самая нижняя точка в средней полосе по ширине: у головы низ
+# картинки может быть косой или хвостом, а шея всегда под лицом.
 CANON = {
-    "head": (49, "bottom"),
+    "head": (49, "neck"),
     "torso": (50, "bottom"),
     "arm_front": (40, "top"),
     "arm_back": (40, "top"),
@@ -114,25 +116,47 @@ SLOTS = {
 # ─────────────────────────── Вырезание фона ───────────────────────────
 
 
+def erode(mask: np.ndarray, r: int) -> np.ndarray:
+    """Сжать маску на r пикселей (минимум по квадратному окну)."""
+    out = mask.copy()
+    for dy in range(-r, r + 1):
+        for dx in range(-r, r + 1):
+            out &= np.roll(np.roll(mask, dy, axis=0), dx, axis=1)
+    return out
+
+
 def key_magenta(rgb: np.ndarray) -> np.ndarray:
     """RGB uint8 → RGBA float, фон #FF00FF прозрачный, край без бахромы.
 
-    «Пурпурность» пикселя — min(R, B) − G: на фоне ≈ 255, на любом цвете
-    персонажа (кожа, коричневый, синий, чёрный контур) ≤ 20. Между ними —
-    сглаженный край, и там альфа берётся линейно. JPEG-артефакты вокруг
-    контура попадают в тот же диапазон, поэтому формат исходника не важен.
+    «Пурпурность» пикселя — min(R, B) − G: на фоне ≈ 255, у кожи, дерева,
+    синего и чёрного контура ≈ 0. Но у краевого пикселя (фон, смешанный с
+    тёмным контуром) она 60–130 — ровно как у тёмно-фиолетовой ткани.
+    По цвету их не различить, только по месту: край — это полоса у границы
+    с фоном, ткань — внутри. Поэтому два прохода:
+
+    1. жёсткая маска: фон — всё, что почти чистый пурпур;
+    2. в кольце шириной в пару пикселей вдоль границы — мягкая альфа по
+       пурпурности и despill (вычитаем долю фона из цвета). Внутренние
+       пиксели не трогаем, какого бы цвета они ни были.
+
+    JPEG-артефакты вокруг контура попадают в кольцо, поэтому формат
+    исходника не важен.
     """
     a = rgb.astype(np.float32)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     excess = np.minimum(r, b) - g
-    alpha = 1.0 - np.clip((excess - 20.0) / (180.0 - 20.0), 0.0, 1.0)
 
-    # Despill: краевой пиксель — смесь цвета персонажа и фона. Вычитаем
-    # долю фона и делим на альфу, иначе по контуру остаётся розовый ореол.
+    solid = excess < 150
+    interior = erode(solid, 2)
+    ring = solid & ~interior
+
+    soft = 1.0 - np.clip((excess - 20.0) / (200.0 - 20.0), 0.0, 1.0)
+    alpha = np.where(interior, 1.0, np.where(ring, soft, 0.0))
+
     key = np.array([255.0, 0.0, 255.0])
     al = alpha[..., None]
-    color = np.where(al > 0.02, (a - (1 - al) * key) / np.maximum(al, 0.02), a)
-    color = np.clip(color, 0, 255)
+    despilled = np.clip((a - (1 - al) * key) / np.maximum(al, 0.02), 0, 255)
+    color = np.where(ring[..., None], despilled, a)
     return np.dstack([color, alpha * 255.0])
 
 
@@ -204,6 +228,12 @@ def pivot_of(rgba: np.ndarray, where: str | tuple[str, float]) -> tuple[float, f
     if isinstance(where, tuple):
         _, k = where
         return (rgba.shape[1] / 2, rgba.shape[0] * (1 - k))
+    if where == "neck":
+        w = alpha.shape[1]
+        band = alpha[:, int(w * 0.35) : int(w * 0.75)]
+        row = int(np.where(band.any(axis=1))[0].max())
+        xs = np.where(band[row])[0] + int(w * 0.35)
+        return ((xs.min() + xs.max()) / 2 + 0.5, float(row) + 1)
     row = 0 if where == "top" else alpha.shape[0] - 1
     xs = np.where(alpha[row])[0]
     if len(xs) == 0:
@@ -211,12 +241,17 @@ def pivot_of(rgba: np.ndarray, where: str | tuple[str, float]) -> tuple[float, f
     return ((xs.min() + xs.max()) / 2 + 0.5, float(row) + (0 if where == "top" else 1))
 
 
-def fit(rgba: np.ndarray, target_h: int) -> Image.Image:
-    """Обрезать по альфе и привести к высоте, сохранив пропорции."""
+def fit(rgba: np.ndarray, target_h: int, where: str | tuple[str, float] = "bottom") -> Image.Image:
+    """Обрезать по альфе и привести к высоте, сохранив пропорции.
+
+    Для головы высота меряется до шеи, а не до низа картинки: коса или
+    хвост ниже шеи не должны уменьшать лицо."""
     piece = trim(rgba)
-    scale = target_h / piece.shape[0]
+    measured = pivot_of(piece, where)[1] if where == "neck" else piece.shape[0]
+    scale = target_h / measured
     img = Image.fromarray(piece.astype(np.uint8), "RGBA")
-    return img.resize((max(1, round(piece.shape[1] * scale)), target_h), Image.Resampling.LANCZOS)
+    size = (max(1, round(piece.shape[1] * scale)), max(1, round(piece.shape[0] * scale)))
+    return img.resize(size, Image.Resampling.LANCZOS)
 
 
 def cut_sheet(path: Path) -> list[Part]:
@@ -232,7 +267,7 @@ def cut_sheet(path: Path) -> list[Part]:
         if name in DIM:
             piece = piece.copy()
             piece[..., :3] *= DIM[name]
-        img = fit(piece, target_h)
+        img = fit(piece, target_h, where)
         if name.startswith("leg_"):
             img = img.crop((0, HEM_BELOW_HIP - LEG_HIDDEN, img.width, img.height))
         parts.append(Part(name, img, pivot_of(np.asarray(img), where)))
