@@ -1,0 +1,42 @@
+/* Макет 4 — «Ночной лес».
+   Тёмный, как сейчас, но тёплый: глубокая зелень вместо графита, золото
+   вместо неона, звёзды и туман. Ощущение: ночь перед походом. */
+
+:root {
+  --bg: #0b1a17;
+  --bg-elev: #12261f;
+  --bg-sunken: #07120f;
+  --line: #244438;
+  --line-soft: #183129;
+
+  --ink: #f3efe4;
+  --ink-dim: #a9b9ad;
+  --ink-faint: #6f8477;
+
+  --emerald: #7ddc8f;
+  --emerald-deep: #2f8a55;
+  --gold: #f2c14e;
+  --crimson: #ef6b5f;
+  --steel: #8fb3c9;
+
+  --tile: #10241e;
+  --tile-path: #1c3a2e;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  --serif: Georgia, "Times New Roman", "Noto Serif", serif;
+}
+
+body {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 78% 9%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 42% 32%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 91% 46%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 24% 61%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 66% 74%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 8% 88%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 55% 94%, rgba(255, 255, 255, 0.35), transparent);
+  background-size: 900px 700px;
+}

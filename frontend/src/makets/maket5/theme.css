@@ -1,0 +1,34 @@
+/* Макет 5 — «Детский».
+   Для 8–11 лет: небо, солнце, трава, коралл. Всё круглое и большое,
+   текста мало, каждый блок — одна мысль. Маскот и волны между секциями. */
+
+:root {
+  --bg: #eaf5ff;
+  --bg-elev: #ffffff;
+  --bg-sunken: #fffdf5;
+  --line: #cfe3f5;
+  --line-soft: #e2eef9;
+
+  --ink: #23324a;
+  --ink-dim: #5b6b85;
+  --ink-faint: #8e9bb3;
+
+  --emerald: #3fbf62;
+  --emerald-deep: #2c9a4a;
+  --gold: #ffc93d;
+  --crimson: #ff6b6b;
+  --steel: #4d96ff;
+  --sun: #ffd93d;
+  --grass: #6bcb77;
+  --sky: #4d96ff;
+  --coral: #ff6b6b;
+  --lilac: #b38cff;
+
+  --tile: #dff5d4;
+  --tile-path: #bfe9ad;
+
+  --radius: 28px;
+  --radius-sm: 18px;
+
+  --sans: "Rubik", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}

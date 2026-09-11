@@ -1,0 +1,346 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 66px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--gold);
+}
+
+.logoMark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 12px 3px color-mix(in srgb, var(--gold) 55%, transparent);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  font-size: 15px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink-dim);
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+/* .nav a специфичнее .btn — цвет кнопки в шапке задаём отдельно */
+.nav a.btnGold,
+.nav a.btnGold:hover {
+  color: #2a1e05;
+}
+
+@media (max-width: 640px) {
+  .nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ─── Кнопки ─── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: var(--sans);
+}
+
+.btnGold {
+  background: var(--gold);
+  color: #2a1e05;
+  box-shadow: 0 8px 30px -8px color-mix(in srgb, var(--gold) 60%, transparent);
+}
+
+.btnGold:hover {
+  background: #ffd26a;
+}
+
+.btnGhost {
+  color: var(--ink);
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--bg-elev) 70%, transparent);
+}
+
+.btnGhost:hover {
+  border-color: var(--ink-faint);
+}
+
+.btnSmall {
+  padding: 8px 18px;
+  font-size: 14px;
+}
+
+/* ─── Первый экран ─── */
+
+.hero {
+  position: relative;
+  padding-block: var(--gap-6) 0;
+  text-align: center;
+  overflow: hidden;
+  /* Луна вверху и туман внизу */
+  background:
+    radial-gradient(
+      700px 380px at 50% -120px,
+      color-mix(in srgb, var(--gold) 16%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(to top, color-mix(in srgb, var(--emerald) 8%, transparent), transparent 40%);
+}
+
+.firefly {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px 3px color-mix(in srgb, var(--gold) 60%, transparent);
+  animation: drift 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.2; }
+  30% { opacity: 0.9; }
+  50% { transform: translate(18px, -26px); opacity: 0.6; }
+  80% { opacity: 0.1; }
+}
+
+.eyebrow {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--gold);
+  margin-bottom: var(--gap-2);
+}
+
+.h1 {
+  font-family: var(--serif);
+  font-size: clamp(38px, 6.6vw, 68px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  max-width: 16ch;
+  margin-inline: auto;
+}
+
+.accent {
+  color: var(--gold);
+}
+
+.lead {
+  margin: var(--gap-3) auto 0;
+  max-width: 56ch;
+  font-size: 19px;
+  color: var(--ink-dim);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap-2);
+  margin-top: var(--gap-4);
+}
+
+.badges {
+  list-style: none;
+  padding: 0;
+  margin: var(--gap-3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 22px;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.badges li::before {
+  content: "✦ ";
+  color: var(--gold);
+}
+
+.demoWrap {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--gap-5);
+  text-align: left;
+}
+
+/* Силуэт елей под демкой: страница «стоит» на лесе */
+.trees {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: -40px;
+  color: var(--bg-sunken);
+}
+
+/* ─── Секции ─── */
+
+.section {
+  padding-block: var(--gap-5);
+}
+
+.sectionDeep {
+  background: var(--bg-sunken);
+}
+
+.h2 {
+  font-family: var(--serif);
+  font-size: clamp(30px, 4vw, 44px);
+  max-width: 24ch;
+}
+
+.sub {
+  margin-top: var(--gap-2);
+  color: var(--ink-dim);
+  font-size: 18px;
+  max-width: 60ch;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.card {
+  background: linear-gradient(160deg, var(--bg-elev), color-mix(in srgb, var(--bg-elev) 60%, var(--bg)));
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: var(--gap-3);
+}
+
+.cardGlyph {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--gap-2);
+  font-size: 16px;
+  color: var(--bg);
+}
+
+.emerald { background: var(--emerald); }
+.gold { background: var(--gold); }
+.crimson { background: var(--crimson); }
+.steel { background: var(--steel); }
+
+.h3 {
+  font-family: var(--serif);
+  font-size: 22px;
+  margin-bottom: var(--gap-1);
+}
+
+.cardText {
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+/* ─── Медали ─── */
+
+.medals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.medal {
+  text-align: center;
+  padding: var(--gap-3);
+  border-radius: var(--radius);
+  border: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--bg-elev) 60%, transparent);
+}
+
+.medalIcon {
+  display: block;
+  font-size: 36px;
+  color: var(--gold);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 70%, transparent);
+  margin-bottom: var(--gap-2);
+}
+
+.note {
+  margin-top: var(--gap-4);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-dim);
+  max-width: 60ch;
+  padding-left: var(--gap-3);
+  border-left: 2px solid var(--gold);
+}
+
+/* ─── Призыв ─── */
+
+.startBox {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: var(--gap-5) var(--gap-4);
+  text-align: center;
+  background:
+    radial-gradient(
+      500px 260px at 50% 110%,
+      color-mix(in srgb, var(--gold) 22%, transparent),
+      transparent 70%
+    ),
+    var(--bg-elev);
+}
+
+.startBox .h2,
+.startBox .sub {
+  margin-inline: auto;
+}
+
+.startActions {
+  margin-top: var(--gap-3);
+}
+
+.footer {
+  border-top: 1px solid var(--line-soft);
+  padding-block: var(--gap-3);
+  font-size: 14px;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+}

@@ -1,0 +1,389 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 2px solid var(--line);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 900;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.logoMark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--emerald);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--line);
+  transform: rotate(-6deg);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink-dim);
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+/* .nav a специфичнее .btn — цвет кнопки в шапке задаём отдельно */
+.nav a.btnGreen,
+.nav a.btnGreen:hover {
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ─── Кнопки: цветная плоскость, чёрная обводка, тень-смещение ─── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 26px;
+  border-radius: var(--radius-sm);
+  font: 800 16px var(--sans);
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--gold);
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 var(--shadow);
+  cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--shadow);
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--shadow);
+}
+
+.btnGreen {
+  background: var(--emerald);
+  color: #fff;
+}
+
+.btnWhite {
+  background: #fff;
+}
+
+.btnSmall {
+  padding: 9px 16px;
+  font-size: 14px;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+/* ─── Первый экран ─── */
+
+.hero {
+  padding-block: var(--gap-5);
+  background: var(--bg-sunken);
+  border-bottom: 2px solid var(--line);
+  overflow: hidden;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 7fr);
+  gap: var(--gap-4);
+  align-items: center;
+}
+
+@media (max-width: 960px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.sticker {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--violet);
+  font-weight: 900;
+  font-size: 14px;
+  transform: rotate(-3deg);
+  box-shadow: 3px 3px 0 var(--shadow);
+  margin-bottom: var(--gap-3);
+}
+
+.h1 {
+  font-size: clamp(38px, 5.6vw, 64px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.h1 .under {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  /* Свой контекст наложения: иначе z-index:-1 у плашки уводит её под фон секции */
+  isolation: isolate;
+}
+
+.h1 .under::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: 4px;
+  height: 14px;
+  background: var(--gold);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+  z-index: -1;
+  transform: rotate(-1deg);
+}
+
+.lead {
+  margin-top: var(--gap-3);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  max-width: 44ch;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  margin-top: var(--gap-4);
+}
+
+.badges {
+  list-style: none;
+  padding: 0;
+  margin: var(--gap-3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badges li {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: #fff;
+}
+
+/* Демка — как большой стикер с наклейками по углам */
+.demoCard {
+  position: relative;
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-2);
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.demoTag {
+  position: absolute;
+  top: -16px;
+  right: 22px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--crimson);
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  transform: rotate(4deg);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+/* ─── Секции ─── */
+
+.section {
+  padding-block: var(--gap-5);
+}
+
+.h2 {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  max-width: 22ch;
+}
+
+.sub {
+  margin-top: var(--gap-2);
+  color: var(--ink-dim);
+  font-weight: 600;
+  font-size: 18px;
+  max-width: 58ch;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.card {
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-3);
+  box-shadow: 5px 5px 0 var(--shadow);
+  background: #fff;
+}
+
+.card.emerald { background: #e8f9d5; }
+.card.gold { background: #fff4c2; }
+.card.crimson { background: #ffe0e0; }
+.card.steel { background: #dcf1fd; }
+
+.cardIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 2px solid var(--line);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+  margin-bottom: var(--gap-2);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.h3 {
+  font-size: 21px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+
+.cardText {
+  color: var(--ink-dim);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ─── Медали ─── */
+
+.sectionAlt {
+  background: var(--gold);
+  border-top: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+}
+
+.medals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.medal {
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-3);
+  box-shadow: 5px 5px 0 var(--shadow);
+  text-align: center;
+}
+
+.medal:nth-child(1) { transform: rotate(-1.5deg); }
+.medal:nth-child(2) { transform: rotate(1deg); }
+.medal:nth-child(3) { transform: rotate(-0.5deg); }
+
+.medalIcon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--gap-2);
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--steel);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.note {
+  margin-top: var(--gap-4);
+  padding: var(--gap-2) var(--gap-3);
+  background: #fff;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  max-width: 62ch;
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+/* ─── Призыв ─── */
+
+.startBox {
+  background: var(--steel);
+  color: #fff;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-4);
+  text-align: center;
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.startBox .h2,
+.startBox .sub {
+  margin-inline: auto;
+  color: #fff;
+}
+
+.startBox .sub {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.startActions {
+  margin-top: var(--gap-3);
+}
+
+.footer {
+  border-top: 2px solid var(--line);
+  padding-block: var(--gap-3);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+}

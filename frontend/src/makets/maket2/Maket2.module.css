@@ -1,0 +1,325 @@
+.header {
+  background: var(--bg-sunken);
+  border-bottom: 4px solid var(--shadow);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 66px;
+}
+
+.logo {
+  font-family: var(--pixel);
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--gold);
+  text-shadow: 3px 3px 0 var(--shadow);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink-dim);
+}
+
+.nav a:hover {
+  color: var(--ink);
+}
+
+/* .nav a специфичнее .btn — цвет кнопки в шапке задаём отдельно */
+.nav a.btn,
+.nav a.btn:hover {
+  color: var(--shadow);
+}
+
+@media (max-width: 640px) {
+  .nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ─── Кнопки: объём за счёт нижней грани, как в старых играх ─── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  font-family: var(--pixel);
+  font-size: 12px;
+  line-height: 1.4;
+  text-decoration: none;
+  color: var(--shadow);
+  background: var(--emerald);
+  border: 3px solid var(--shadow);
+  box-shadow: 0 6px 0 var(--shadow);
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 var(--shadow);
+}
+
+.btn:active {
+  transform: translateY(6px);
+  box-shadow: none;
+}
+
+.btnGold {
+  background: var(--gold);
+}
+
+.btnGhost {
+  background: var(--bg-elev);
+  color: var(--ink);
+}
+
+/* ─── Первый экран ─── */
+
+.hero {
+  padding-block: var(--gap-5) var(--gap-4);
+  text-align: center;
+}
+
+.eyebrow {
+  font-family: var(--pixel);
+  font-size: 11px;
+  color: var(--gold);
+  margin-bottom: var(--gap-3);
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.h1 {
+  font-family: var(--pixel);
+  font-size: clamp(22px, 4.2vw, 44px);
+  line-height: 1.5;
+  max-width: 20ch;
+  margin-inline: auto;
+  text-shadow: 4px 4px 0 var(--shadow);
+  font-weight: 400;
+}
+
+.accent {
+  color: var(--emerald);
+}
+
+.lead {
+  margin: var(--gap-3) auto 0;
+  max-width: 56ch;
+  font-size: 18px;
+  color: var(--ink-dim);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--gap-2);
+  margin-top: var(--gap-4);
+}
+
+.badges {
+  list-style: none;
+  padding: 0;
+  margin: var(--gap-3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.badges li::before {
+  content: "■ ";
+  color: var(--gold);
+}
+
+/* Демка — как игровой экран в рамке приставки */
+.screen {
+  margin-top: var(--gap-4);
+  padding: var(--gap-2);
+  background: var(--bg-elev);
+  border: 4px solid var(--shadow);
+  box-shadow: 8px 8px 0 var(--shadow);
+  text-align: left;
+}
+
+.screen svg {
+  shape-rendering: crispEdges;
+}
+
+.screenBar {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--gold);
+  padding: 2px 2px 12px;
+}
+
+/* ─── Секции ─── */
+
+.section {
+  padding-block: var(--gap-5);
+}
+
+.sectionAlt {
+  background: var(--bg-sunken);
+  border-top: 4px solid var(--shadow);
+  border-bottom: 4px solid var(--shadow);
+}
+
+.h2 {
+  font-family: var(--pixel);
+  font-size: clamp(16px, 2.6vw, 26px);
+  line-height: 1.6;
+  font-weight: 400;
+  max-width: 30ch;
+}
+
+.h2::before {
+  content: "> ";
+  color: var(--emerald);
+}
+
+.sub {
+  margin-top: var(--gap-2);
+  color: var(--ink-dim);
+  font-size: 17px;
+  max-width: 60ch;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.card {
+  background: var(--bg-elev);
+  border: 3px solid var(--shadow);
+  box-shadow: 6px 6px 0 var(--shadow);
+  padding: var(--gap-3);
+}
+
+.cardTag {
+  display: inline-block;
+  font-family: var(--pixel);
+  font-size: 9px;
+  padding: 6px 8px;
+  color: var(--shadow);
+  margin-bottom: var(--gap-2);
+}
+
+.emerald { background: var(--emerald); }
+.gold { background: var(--gold); }
+.crimson { background: var(--crimson); }
+.steel { background: var(--steel); }
+
+.h3 {
+  font-size: 20px;
+  margin-bottom: var(--gap-1);
+}
+
+.cardText {
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+/* ─── Медали — как достижения в игре ─── */
+
+.medals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.medal {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: flex-start;
+  background: var(--bg-elev);
+  border: 3px solid var(--shadow);
+  padding: var(--gap-2) var(--gap-3);
+}
+
+.medalIcon {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--gold);
+  color: var(--shadow);
+  font-size: 22px;
+  border: 3px solid var(--shadow);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.note {
+  margin-top: var(--gap-4);
+  font-family: var(--pixel);
+  font-size: 10px;
+  line-height: 1.9;
+  color: var(--gold);
+  max-width: 70ch;
+}
+
+/* ─── Призыв ─── */
+
+.startBox {
+  background: var(--bg-elev);
+  border: 4px solid var(--shadow);
+  box-shadow: 10px 10px 0 var(--shadow);
+  padding: var(--gap-4);
+  text-align: center;
+}
+
+.startBox .h2 {
+  margin-inline: auto;
+}
+
+.startBox .h2::before {
+  content: none;
+}
+
+.startBox .sub {
+  margin-inline: auto;
+}
+
+.startActions {
+  margin-top: var(--gap-3);
+}
+
+.footer {
+  padding-block: var(--gap-3);
+  font-family: var(--pixel);
+  font-size: 9px;
+  line-height: 2;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  border-top: 4px solid var(--shadow);
+}

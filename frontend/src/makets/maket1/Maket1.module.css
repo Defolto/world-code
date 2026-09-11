@@ -1,0 +1,337 @@
+.header {
+  border-bottom: 2px solid var(--ink);
+  background: var(--bg);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.logo em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.nav {
+  display: flex;
+  gap: var(--gap-3);
+  font-size: 15px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink-dim);
+  border-bottom: 1.5px solid transparent;
+}
+
+.nav a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .nav a:not(:last-child) {
+    display: none;
+  }
+}
+
+/* ─── Первый экран ─── */
+
+.hero {
+  padding-block: var(--gap-5);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: var(--gap-4);
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin-bottom: var(--gap-2);
+}
+
+.eyebrow::before {
+  content: "# ";
+  color: var(--accent);
+}
+
+.h1 {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5.2vw, 58px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+.mark {
+  /* Маркер по строке: фон-полоска чуть ниже базовой линии */
+  background: linear-gradient(transparent 55%, var(--marker) 55%, var(--marker) 92%, transparent 92%);
+  padding-inline: 2px;
+}
+
+.lead {
+  margin-top: var(--gap-3);
+  font-size: 18px;
+  color: var(--ink-dim);
+  max-width: 44ch;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  margin-top: var(--gap-4);
+}
+
+.btnPrimary,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 22px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border: 2px solid var(--ink);
+}
+
+.btnPrimary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btnPrimary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btnGhost {
+  color: var(--ink);
+  background: transparent;
+}
+
+.btnGhost:hover {
+  background: var(--bg-elev);
+}
+
+.badges {
+  list-style: none;
+  padding: 0;
+  margin: var(--gap-3) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.badges li::before {
+  content: "✓ ";
+  color: var(--emerald);
+  font-weight: 700;
+}
+
+/* Демка — как вклеенная в тетрадь карточка */
+.demoCard {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-2);
+  box-shadow:
+    0 1px 0 var(--line),
+    0 14px 30px -18px rgba(31, 43, 61, 0.35);
+  position: relative;
+}
+
+.demoCard::before {
+  /* Полоска скотча сверху */
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 92px;
+  height: 22px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: rgba(255, 229, 138, 0.75);
+  border: 1px solid rgba(217, 165, 32, 0.35);
+}
+
+.caption {
+  margin-top: var(--gap-2);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+/* ─── Секции ─── */
+
+.section {
+  padding-block: var(--gap-5);
+  border-top: 1px solid var(--line);
+}
+
+.h2 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.6vw, 40px);
+  max-width: 24ch;
+}
+
+.h2::before {
+  content: "§ ";
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.sub {
+  margin-top: var(--gap-2);
+  color: var(--ink-dim);
+  font-size: 17px;
+  max-width: 60ch;
+}
+
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--gap-3);
+  border-top: 4px solid var(--ink);
+}
+
+.card.emerald { border-top-color: var(--emerald); }
+.card.gold { border-top-color: var(--gold); }
+.card.crimson { border-top-color: var(--crimson); }
+.card.steel { border-top-color: var(--steel); }
+
+.h3 {
+  font-family: var(--serif);
+  font-size: 21px;
+  margin-bottom: var(--gap-1);
+}
+
+.cardText {
+  color: var(--ink-dim);
+  font-size: 15px;
+}
+
+/* ─── Медали — пометки на полях ─── */
+
+.medals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.medal {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--gap-2);
+  align-items: start;
+}
+
+.medalIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  font-size: 20px;
+  color: var(--accent);
+  background: var(--bg-elev);
+}
+
+.note {
+  margin-top: var(--gap-4);
+  padding: var(--gap-2) var(--gap-3);
+  border-left: 3px solid var(--accent);
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-dim);
+  max-width: 60ch;
+}
+
+/* ─── Призыв ─── */
+
+.start {
+  padding-block: var(--gap-5);
+  border-top: 1px solid var(--line);
+}
+
+.startBox {
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius);
+  padding: var(--gap-4);
+  text-align: center;
+}
+
+.startBox .h2 {
+  margin-inline: auto;
+}
+
+.startBox .h2::before {
+  content: none;
+}
+
+.startBox .sub {
+  margin-inline: auto;
+  color: rgba(246, 241, 230, 0.75);
+}
+
+.btnBig {
+  margin-top: var(--gap-3);
+  padding: 15px 32px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  font: 600 17px var(--sans);
+  cursor: pointer;
+}
+
+.btnBig:hover {
+  background: #f07a44;
+}
+
+.footer {
+  border-top: 2px solid var(--ink);
+  padding-block: var(--gap-3);
+  font-size: 14px;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+}

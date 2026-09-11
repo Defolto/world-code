@@ -1,0 +1,44 @@
+/* Макет 2 — «Пиксельное приключение».
+   Глубокий индиго, сочные плоские цвета, ноль скруглений, жёсткие
+   тени-смещения. Заголовки — пиксельным шрифтом, тело — обычным:
+   пиксельный на длинном тексте нечитаем. */
+
+:root {
+  --bg: #1b1d3a;
+  --bg-elev: #262a55;
+  --bg-sunken: #12142a;
+  --line: #4d53a3;
+  --line-soft: #343970;
+
+  --ink: #ffffff;
+  --ink-dim: #b9bde8;
+  --ink-faint: #7d82c2;
+
+  --emerald: #58e37c;
+  --emerald-deep: #2fa354;
+  --gold: #ffd23f;
+  --crimson: #ff5a5f;
+  --steel: #6ec3ff;
+
+  --tile: #3f8f3c;
+  --tile-path: #c9a86c;
+
+  --radius: 0px;
+  --radius-sm: 0px;
+
+  --pixel: "Press Start 2P", "Courier New", monospace;
+  --shadow: #0b0c1c;
+}
+
+body {
+  /* Звёздное небо: несколько точек, размноженных повтором фона */
+  background-image:
+    radial-gradient(#ffffff 1px, transparent 1.5px),
+    radial-gradient(#8f95ff 1px, transparent 1.5px);
+  background-size:
+    140px 140px,
+    220px 220px;
+  background-position:
+    0 0,
+    70px 90px;
+}

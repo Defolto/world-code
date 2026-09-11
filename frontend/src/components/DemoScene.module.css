@@ -89,6 +89,7 @@
   padding: var(--gap-2);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: var(--gap-1);
   min-width: 0;
 }
@@ -100,13 +101,13 @@
 }
 
 .tile {
-  fill: #131a24;
+  fill: var(--tile);
   stroke: var(--line-soft);
   stroke-width: 1;
 }
 
 .tilePath {
-  fill: #182231;
+  fill: var(--tile-path);
   stroke: var(--line-soft);
   stroke-width: 1;
 }

@@ -1,0 +1,40 @@
+/* Макет 1 — «Тетрадь программиста».
+   Светлая бумага, синие чернила, тёплый оранжевый маркер.
+   Ощущение: учебник, который хочется открыть. */
+
+:root {
+  --bg: #f6f1e6;
+  --bg-elev: #fffdf8;
+  --bg-sunken: #fbf8f1;
+  --line: #d6cbb6;
+  --line-soft: #e6ddcb;
+
+  --ink: #1f2b3d;
+  --ink-dim: #5a6577;
+  --ink-faint: #8a93a1;
+
+  --emerald: #2f8a55;
+  --emerald-deep: #236b41;
+  --gold: #d9a520;
+  --crimson: #d04a3c;
+  --steel: #5b7ba3;
+
+  --accent: #e0632b;
+  --marker: #ffe58a;
+
+  --tile: #f2ecdf;
+  --tile-path: #e8dfcb;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+
+  --serif: Georgia, "Times New Roman", "Noto Serif", serif;
+}
+
+body {
+  /* Клетка тетради: две сетки тонких линий поверх бумаги */
+  background-image:
+    linear-gradient(to right, rgba(31, 43, 61, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(31, 43, 61, 0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
