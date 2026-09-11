@@ -2,11 +2,14 @@
   "name": "world-code-deploy",
   "private": true,
   "type": "module",
-  "description": "Раннер деплоя на NetAngels. Сам проект живёт в frontend/ и backend/.",
+  "description": "Раннеры проекта: локальная разработка и деплой на NetAngels. Сам проект живёт в frontend/ и backend/.",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
+    "dev": "node dev.mjs",
+    "dev:web": "node dev.mjs --only=web",
+    "dev:api": "node dev.mjs --only=api",
     "deploy": "node deploy.mjs",
     "deploy:sites": "node deploy.mjs --list-sites",
     "deploy:key": "node deploy.mjs --add-ssh-key"
