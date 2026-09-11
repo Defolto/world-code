@@ -113,6 +113,10 @@ export class DemoPlayer {
     let armAngle = 8;
     let legAngle = 0;
     let bob = 0;
+    // Насколько герой «в походке»: 0 стоя, 1 на ходу. Плавно нарастает в
+    // первой клетке пробежки и спадает в последней — чтобы наклон и центр
+    // маха задней руки не включались скачком.
+    let walking = 0;
 
     if (step.kind === "move") {
       // Разгон только в первой клетке пробежки, торможение — в последней.
@@ -124,6 +128,7 @@ export class DemoPlayer {
       const last = next?.kind !== "move";
       const e = first && last ? easeInOut(p) : first ? easeIn(p) : last ? easeOut(p) : p;
       col = step.fromCol + (step.toCol - step.fromCol) * e;
+      walking = Math.min(1, first ? p * 3 : 1, last ? (1 - p) * 3 : 1);
 
       // Одна клетка — один полный шаг обеими ногами. Фаза — функция от
       // прогресса, не отдельная анимация. Рука идёт против своей ноги
@@ -134,7 +139,7 @@ export class DemoPlayer {
       // Подскок на каждый шаг, то есть дважды за клетку. sin², а не |sin|:
       // у модуля излом в нуле, и герой дёргается при каждой постановке ноги
       bob = -(Math.sin(p * Math.PI * 2) ** 2) * 1.4;
-      lean = 3;
+      lean = 3 * walking;
     } else if (step.kind === "attack") {
       // Боевая стойка: ноги врозь, пока идёт замах
       legAngle = -10;
@@ -153,10 +158,12 @@ export class DemoPlayer {
     refs.hero.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
     refs.heroBody.setAttribute("transform", `rotate(${lean.toFixed(2)})`);
     refs.heroArm.setAttribute("transform", `rotate(${armAngle.toFixed(2)})`);
-    // Задняя рука — против передней, с большей амплитудой: она за торсом,
-    // и при равном махе её кисть в передней фазе не видна вовсе. В замахе
-    // не участвует: бьёт одна рука.
-    const armBack = step.kind === "move" ? 8 - (armAngle - 8) * 1.4 : 8;
+    // Задняя рука — против передней, но её мах смещён вперёд: она за
+    // торсом, и симметричный мах показывал бы её только из-за спины.
+    // Со смещением в передней фазе кисть выходит перед грудью, в задней —
+    // прячется за корпус, не вылезая сзади. В замахе не участвует: бьёт
+    // одна рука.
+    const armBack = step.kind === "move" ? 8 - 22 * walking - (armAngle - 8) * 1.1 : 8;
     refs.heroArmBack.setAttribute("transform", `rotate(${armBack.toFixed(2)})`);
     refs.heroLegFront.setAttribute("transform", `rotate(${legAngle.toFixed(2)})`);
     refs.heroLegBack.setAttribute("transform", `rotate(${(-legAngle).toFixed(2)})`);
