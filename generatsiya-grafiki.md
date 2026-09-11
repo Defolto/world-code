@@ -86,7 +86,7 @@ no gradients, no textures, no glow, strict side view facing right
 Single 2D game character for a kids' coding game, full body, strict side
 view facing right, reference pose: standing, arms slightly away from the
 body, legs slightly apart, no limb overlaps the body. Proportions: head
-about 30% of total height, chibi but not baby-like. Character: {описание —
+about 35–40% of total height, chibi, readable silhouette. Character: {описание —
 например: young knight, short brown hair, simple tunic, no armor, no
 weapon}. Style: flat vector cartoon, thick dark outline, three-tone cel
 shading, no gradients, no textures, no glow. Plain solid #FF00FF
