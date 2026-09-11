@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CELL, COLS, DemoPlayer, ROW, ROWS, type SceneRefs } from "../scene/demoPlayer";
+import { CELL, COLS, DISPLAY_CELL, DemoPlayer, ROW, ROWS, type SceneRefs } from "../scene/demoPlayer";
 import { CODE_LINES, COIN_COL, GOBLIN_COL, HERO_START_COL } from "../scene/demoScript";
 import { HeroSprite } from "./HeroSprite";
 import styles from "./DemoScene.module.css";
@@ -79,6 +79,9 @@ export function DemoScene() {
         <svg
           viewBox={`0 0 ${COLS * CELL} ${ROWS * CELL}`}
           className={styles.svg}
+          // Реальный размер: клетка 80px, как будет в игре. Уже контейнера —
+          // сцена сжимается целиком (max-width в .svg), пропорции те же.
+          style={{ width: COLS * DISPLAY_CELL }}
           role="img"
           aria-label="Герой идёт по карте, побеждает гоблина и забирает монету"
         >

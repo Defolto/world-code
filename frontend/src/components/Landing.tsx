@@ -84,10 +84,12 @@ export function Landing() {
               <li>Регистрация не нужна</li>
               <li>Бесплатно</li>
             </ul>
+          </div>
 
-            <div className={styles.demoWrap}>
-              <DemoScene />
-            </div>
+          {/* Вне .shell: сцена в реальных 80px на клетку плюс код рядом
+              в 1120px не помещаются */}
+          <div className={styles.demoWrap}>
+            <DemoScene />
           </div>
         </section>
 

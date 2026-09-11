@@ -176,7 +176,9 @@
 }
 
 .demoWrap {
-  margin-top: var(--gap-5);
+  margin: var(--gap-5) auto 0;
+  max-width: 1240px;
+  padding-inline: var(--edge);
   text-align: left;
 }
 

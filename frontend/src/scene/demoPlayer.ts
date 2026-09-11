@@ -20,6 +20,10 @@ export const COLS = 9;
 export const ROWS = 5;
 export const ROW = 2;
 
+// Размер клетки на экране в CSS-пикселях — решение из generatsiya-grafiki.md.
+// CELL выше — внутренние единицы viewBox, на экран их переводит размер SVG.
+export const DISPLAY_CELL = 80;
+
 export interface SceneRefs {
   hero: SVGGElement;
   heroArm: SVGGElement;
@@ -41,6 +45,8 @@ export interface PlayerEvents {
 }
 
 const easeInOut = (p: number) => (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2);
+const easeIn = (p: number) => p * p;
+const easeOut = (p: number) => 1 - (1 - p) ** 2;
 
 /** Где мы внутри сценария в момент t (мс от начала цикла). */
 function locate(t: number): { step: Step; p: number; index: number } {
@@ -109,14 +115,28 @@ export class DemoPlayer {
     let bob = 0;
 
     if (step.kind === "move") {
-      const e = easeInOut(p);
+      // Разгон только в первой клетке пробежки, торможение — в последней.
+      // Ease на каждой клетке давал остановку через шаг: герой не шёл, а
+      // семенил рывками.
+      const prev = SCRIPT[index - 1];
+      const next = SCRIPT[index + 1];
+      const first = prev?.kind !== "move";
+      const last = next?.kind !== "move";
+      const e = first && last ? easeInOut(p) : first ? easeIn(p) : last ? easeOut(p) : p;
       col = step.fromCol + (step.toCol - step.fromCol) * e;
-      // Фаза шага — тоже функция от прогресса, не отдельная анимация
+
+      // Одна клетка — один полный шаг обеими ногами. Фаза — функция от
+      // прогресса, не отдельная анимация. Рука идёт против своей ноги
+      // (правая нога вперёд — правая рука назад), иначе походка «на ходулях».
       const phase = Math.sin(p * Math.PI * 2);
-      armAngle = 8 + phase * 26;
-      legAngle = phase * 22;
-      bob = Math.abs(Math.sin(p * Math.PI)) * -1.6;
+      legAngle = -phase * 26;
+      armAngle = 8 + phase * 24;
+      // Подскок на каждый шаг, то есть дважды за клетку, не один раз
+      bob = -Math.abs(Math.sin(p * Math.PI * 2)) * 1.4;
+      lean = 3;
     } else if (step.kind === "attack") {
+      // Боевая стойка: ноги врозь, пока идёт замах
+      legAngle = -10;
       // Ключевые кадры замаха: 0 → -72° → +58° → 0
       if (p < 0.35) armAngle = 8 + (-72 - 8) * (p / 0.35);
       else if (p < 0.55) armAngle = -72 + (58 + 72) * ((p - 0.35) / 0.2);
