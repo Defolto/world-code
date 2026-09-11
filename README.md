@@ -10,6 +10,7 @@
 |---|---|
 | [obshchaya-ideya.md](obshchaya-ideya.md) | Продукт, экономика, два контура, граница бесплатного |
 | [tehnicheskaya-arhitektura.md](tehnicheskaya-arhitektura.md) | Исполнение кода, лог кадров, формат уровней, рендер |
+| [generatsiya-grafiki.md](generatsiya-grafiki.md) | Персонажи и предметы: холсты, промпты, конвейер картинок |
 
 ## Главный принцип
 
@@ -32,6 +33,7 @@ run(source, level, seed, loadout) -> FrameLog
 | Редактор | CodeMirror 6, монтируется вручную |
 | Клиент | React 19 + Vite + TypeScript |
 | Сцена | SVG + `requestAnimationFrame`, вне React |
+| Графика | клетка 80px, PNG от ИИ по эталону, части персонажа и предметы на скелете |
 | Бэкенд | Python 3.14, ASGI |
 | БД | PostgreSQL 16, psycopg 3 |
 | Контент | YAML в git, валидация Pydantic на сборке |
@@ -40,17 +42,36 @@ run(source, level, seed, loadout) -> FrameLog
 
 ## Как запустить локально
 
+Один раз — поставить зависимости:
+
 ```bash
-# фронтенд, дев-сервер с горячей перезагрузкой
-cd frontend && npm install && npm run dev
+cd frontend && npm install
+cd backend && python -m venv .venv && .venv/Scripts/python -m pip install -r requirements-dev.txt
+```
 
-# бэкенд поверх собранного фронтенда
+Дальше из корня проекта:
+
+```bash
+npm run dev          # фронтенд + бэкенд, открывать http://127.0.0.1:5173
+npm run dev:web      # только Vite
+npm run dev:api      # только uvicorn на http://127.0.0.1:8010
+```
+
+`npm run dev` поднимает Vite с горячей перезагрузкой и uvicorn с
+`--reload`, выводит оба лога в один терминал с пометками `[web]` и `[api]`,
+Ctrl+C гасит оба. Vite проксирует `/health` и `/api/*` на бэкенд, поэтому
+клиентский код ходит по относительным путям — так же, как на проде.
+
+Проверить прод-раскладку (один ASGI-процесс раздаёт и статику, и API):
+
+```bash
 cd frontend && npm run build
-cd backend
-python -m venv .venv && .venv/Scripts/python -m pip install -r requirements-dev.txt
-STATIC_DIR=../frontend/dist .venv/Scripts/python -m uvicorn asgi:app --port 8010
+cd backend && STATIC_DIR=../frontend/dist .venv/Scripts/python -m uvicorn asgi:app --port 8010
+```
 
-# тесты и линт
+Тесты и линт:
+
+```bash
 cd backend && .venv/Scripts/python -m pytest && .venv/Scripts/python -m ruff check .
 ```
 
@@ -58,9 +79,12 @@ cd backend && .venv/Scripts/python -m pytest && .venv/Scripts/python -m ruff che
 
 ```
 frontend/            React + Vite, сборка уезжает в frontend/dist
+  maketN/            макеты дизайна: /maket1/ … /maket5/, свои темы поверх
+                     тех же токенов и той же демки; тексты общие в src/makets
 backend/             ASGI-приложение
   asgi.py            точка входа: объект app
   server/main.py     маршруты
+dev.mjs              npm run dev — Vite и uvicorn в одном терминале
 deploy.mjs           npm run deploy — сборка, заливка, рестарт
 ```
 
