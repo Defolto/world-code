@@ -10,7 +10,8 @@
 |---|---|
 | [obshchaya-ideya.md](obshchaya-ideya.md) | Продукт, экономика, два контура, граница бесплатного |
 | [tehnicheskaya-arhitektura.md](tehnicheskaya-arhitektura.md) | Исполнение кода, лог кадров, формат уровней, рендер |
-| [generatsiya-grafiki.md](generatsiya-grafiki.md) | Персонажи и предметы: холсты, промпты, конвейер картинок |
+| [generatsiya-grafiki.md](generatsiya-grafiki.md) | Персонажи и предметы: числа, стиль, конвейер картинок |
+| [pravila-promptov.md](pravila-promptov.md) | Промпты для персонажей и предметов, отбор, уроки |
 
 ## Главный принцип
 

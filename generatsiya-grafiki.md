@@ -6,7 +6,8 @@
 
 Коротко: **один эталонный персонаж задаёт стиль и масштаб**, все остальные
 картинки генерируются с ним как референсом, скрипт вырезает фон и
-складывает в атлас. Человек только выбирает из вариантов.
+складывает в атлас. Человек только выбирает из вариантов. Сами промпты —
+в [pravila-promptov.md](pravila-promptov.md).
 
 ## Модель
 
@@ -57,7 +58,7 @@
 | Плащ | 64×112 | плечи, (32, 8) |
 
 Холсты — ориентир: точные размеры зафиксирует скрипт конвейера по
-частям эталона из промпта C. Смена эталона — это перегенерация всего,
+частям эталона (лист разбивки). Смена эталона — это перегенерация всего,
 поэтому он не меняется.
 
 ## Стиль
@@ -73,126 +74,11 @@ no gradients, no textures, no glow, strict side view facing right
 чисто вырезается по контуру. Розового и пурпурного в палитре нет —
 этот цвет занят под фон.
 
-## Промпты
+## Промпты и отбор
 
-Английский — модели так стабильнее. `{…}` — подставляемые поля.
-
-### A. Эталонный персонаж
-
-Уже сделано — `hero_base.png`. Промпт оставлен на случай, если стиль
-придётся перезапускать с нуля; в обычной работе он не нужен.
-
-```
-Single 2D game character for a kids' coding game, full body, strict side
-view facing right, reference pose: standing, arms slightly away from the
-body, legs slightly apart, no limb overlaps the body. Proportions: head
-about 35–40% of total height, chibi, readable silhouette. Character: {описание —
-например: young knight, short brown hair, simple tunic, no armor, no
-weapon}. Style: flat vector cartoon, thick dark outline, three-tone cel
-shading, no gradients, no textures, no glow. Plain solid #FF00FF
-background, no ground shadow, no text, no props, character centered and
-filling about 80% of the image height. 1024x1024.
-```
-
-Без доспеха и оружия — это «голый» персонаж, поверх которого лягут
-предметы.
-
-### B. Другой персонаж в том же риге
-
-Референс — картинка A. Меняется только внешность.
-
-```
-Using the attached character as an exact reference for proportions, pose,
-scale and art style, draw a different character: {описание — например:
-girl with red braid, freckles, green tunic}. Same height, same head size,
-same limb lengths, same standing pose, same strict side view facing right.
-Same flat vector cartoon style, thick dark outline, three-tone cel shading.
-No armor, no weapon. Plain solid #FF00FF background, no shadow, no text,
-same framing as the reference. 1024x1024.
-```
-
-### C. Разбивка на части
-
-Референс — целый персонаж (A или B). Результат кладётся в
-`assets/src/characters/<id>/parts.png`, `id` — латиницей, он же имя
-персонажа в атласе. Швы поправляются руками один раз на персонажа, это
-нормально.
-
-```
-Using the attached character, redraw it as separate body parts laid out on
-a 3x2 grid with generous spacing, exactly the same style, colors and scale:
-top row — [head with hair and neck], [torso with tunic, no arms, no head],
-[front arm with hand, straight, hanging down]; bottom row — [back arm with
-hand, straight], [front leg with foot, straight], [back leg with foot,
-straight]. Each part complete and not occluded, drawn as if seen from the
-side facing right. Plain solid #FF00FF background, no labels, no grid
-lines, no text.
-```
-
-### C′. Другой персонаж сразу частями
-
-Короткий путь вместо B + C: референс — лист разбивки эталона
-`characters/hero/parts.png`, модель повторяет раскладку, масштаб и стиль,
-меняя только внешность. Если раскладка или масштаб поплыли — обратно к
-B + C, там два шага, но каждый надёжнее.
-
-```
-Using the attached parts sheet as an exact template, draw the same six
-body parts for a different character, in the same positions on the same
-3x2 grid, at exactly the same scale, same pose of each part, same flat
-vector cartoon style with thick dark outline and three-tone cel shading.
-Character: {описание}. Parts: top row — [head with hair and neck], [torso
-with tunic and belt, no arms, no head], [front arm with hand, straight,
-hanging down]; bottom row — [back arm with hand, straight], [front leg
-with trouser and shoe, straight], [back leg with trouser and shoe,
-straight]. Side view facing right. Plain solid #FF00FF background, no
-labels, no grid lines, no text.
-```
-
-Проверить: части того же размера, что на эталонном листе (положить
-рядом), профиль вправо, шея не спрятана под волосами — она нужна для
-стыка с торсом.
-
-### D. Предмет
-
-Референс — эталонный персонаж A. Описание берётся из поля `silhouette`
-в YAML предмета.
-
-```
-Single game item for the {helmet|armor|weapon|boots|cape} slot, drawn to
-fit the attached reference character: same scale, same flat vector cartoon
-style, thick dark outline, three-tone cel shading. Strict side view facing
-right. Item: {name} — {silhouette}. {уточнение по слоту, см. ниже}. Plain
-solid #FF00FF background, nothing else in the image, item centered.
-1024x1024.
-```
-
-Уточнения по слоту:
-
-| Слот | Добавить в промпт |
-|---|---|
-| helmet | `Drawn as worn on the reference character's head, head itself not included, only the helmet.` |
-| armor | `Chest armor covering the torso and shoulders only, no arms, no head, no legs; shape follows the reference torso.` |
-| weapon | `Vertical orientation, handle at the bottom, blade or head at the top, no hand holding it.` |
-| boots | `One boot, seen from the side, toe pointing right, no leg above the boot.` |
-| cape | `Cape hanging from the shoulders down the back, seen from the side, no body inside.` |
-
-### E. Враг
-
-Враги без слотов, поэтому цельной картинкой в той же схеме, что A, но
-со своим описанием. Части для анимации (рука, голова) — через C, если
-враг атакует; иначе достаточно целого.
-
-## Отбор
-
-Смотреть перед тем, как принять картинку:
-
-- строго вид сбоку, лицом вправо — три четверти в брак;
-- конечности не перекрывают тело (иначе не режется на части);
-- нет тени на земле, текста, лишних предметов, «шахматки» вместо фона;
-- в палитре нет пурпурного и розового;
-- стиль совпадает с эталоном рядом, а не по памяти;
-- **уменьшить до 60 px и посмотреть** — если силуэт не читается, картинка не подходит, сколько бы в ней ни было деталей.
+Вынесены в [pravila-promptov.md](pravila-promptov.md): шаблоны A–E, что
+писать в описании, чек-лист отбора и накопленные уроки. Здесь — только
+что с картинкой происходит дальше.
 
 ## Конвейер
 
