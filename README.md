@@ -75,6 +75,13 @@ cd backend && STATIC_DIR=../frontend/dist .venv/Scripts/python -m uvicorn asgi:a
 cd backend && .venv/Scripts/python -m pytest && .venv/Scripts/python -m ruff check .
 ```
 
+Атлас героя из картинок в `assets/src` — после смены картинок, результат
+коммитится:
+
+```bash
+backend/.venv/Scripts/python tools/sprites.py hero
+```
+
 ## Раскладка
 
 ```
@@ -84,6 +91,8 @@ frontend/            React + Vite, сборка уезжает в frontend/dist
 backend/             ASGI-приложение
   asgi.py            точка входа: объект app
   server/main.py     маршруты
+assets/src/          исходники картинок от ИИ (1024×1024, фон #FF00FF)
+tools/sprites.py     вырезает фон, собирает атлас в frontend/src/assets/sprites
 dev.mjs              npm run dev — Vite и uvicorn в одном терминале
 deploy.mjs           npm run deploy — сборка, заливка, рестарт
 ```

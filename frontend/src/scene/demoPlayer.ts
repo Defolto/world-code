@@ -24,6 +24,11 @@ export interface SceneRefs {
   hero: SVGGElement;
   heroArm: SVGGElement;
   heroBody: SVGGElement;
+  // Суставы ходьбы. Позы — данные, как в tehnicheskaya-arhitektura.md:
+  // ноги в противофазе, задняя рука — в противофазе передней.
+  heroArmBack: SVGGElement;
+  heroLegFront: SVGGElement;
+  heroLegBack: SVGGElement;
   goblin: SVGGElement;
   goblinHp: SVGRectElement;
   coin: SVGGElement;
@@ -100,13 +105,16 @@ export class DemoPlayer {
     let col = "col" in step ? step.col : 0;
     let lean = 0;
     let armAngle = 8;
+    let legAngle = 0;
     let bob = 0;
 
     if (step.kind === "move") {
       const e = easeInOut(p);
       col = step.fromCol + (step.toCol - step.fromCol) * e;
       // Фаза шага — тоже функция от прогресса, не отдельная анимация
-      armAngle = 8 + Math.sin(p * Math.PI * 2) * 26;
+      const phase = Math.sin(p * Math.PI * 2);
+      armAngle = 8 + phase * 26;
+      legAngle = phase * 22;
       bob = Math.abs(Math.sin(p * Math.PI)) * -1.6;
     } else if (step.kind === "attack") {
       // Ключевые кадры замаха: 0 → -72° → +58° → 0
@@ -124,6 +132,12 @@ export class DemoPlayer {
     refs.hero.setAttribute("transform", `translate(${x.toFixed(2)} ${y.toFixed(2)})`);
     refs.heroBody.setAttribute("transform", `rotate(${lean.toFixed(2)})`);
     refs.heroArm.setAttribute("transform", `rotate(${armAngle.toFixed(2)})`);
+    // Задняя рука качается зеркально передней вокруг покоя (8°), а в
+    // замахе не участвует: бьёт одна рука.
+    const armBack = step.kind === "move" ? 16 - armAngle : 8;
+    refs.heroArmBack.setAttribute("transform", `rotate(${armBack.toFixed(2)})`);
+    refs.heroLegFront.setAttribute("transform", `rotate(${legAngle.toFixed(2)})`);
+    refs.heroLegBack.setAttribute("transform", `rotate(${(-legAngle).toFixed(2)})`);
 
     // --- Гоблин: полоса здоровья и смерть ---
     const landed = hitsLanded(index, p);

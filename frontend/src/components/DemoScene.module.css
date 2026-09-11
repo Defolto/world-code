@@ -120,14 +120,7 @@
   rx: 4;
 }
 
-/* Герой */
-.cape { fill: var(--emerald-deep); }
-.legs { fill: #2b3a4e; }
-.armBack { fill: #37506c; }
-.torso { fill: #46617f; }
-.head { fill: #dcb68d; }
-.helmet { fill: #8fa4bd; }
-.arm { fill: #46617f; }
+/* Герой — картинки из атласа (HeroSprite), кодом только меч-заглушка */
 .guard { fill: var(--gold); }
 .blade { fill: #ccd9ea; }
 

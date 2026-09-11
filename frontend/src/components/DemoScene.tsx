@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CELL, COLS, DemoPlayer, ROW, ROWS, type SceneRefs } from "../scene/demoPlayer";
 import { CODE_LINES, COIN_COL, GOBLIN_COL, HERO_START_COL } from "../scene/demoScript";
+import { HeroSprite } from "./HeroSprite";
 import styles from "./DemoScene.module.css";
 
 /**
@@ -14,6 +15,9 @@ export function DemoScene() {
   const hero = useRef<SVGGElement>(null);
   const heroArm = useRef<SVGGElement>(null);
   const heroBody = useRef<SVGGElement>(null);
+  const heroArmBack = useRef<SVGGElement>(null);
+  const heroLegFront = useRef<SVGGElement>(null);
+  const heroLegBack = useRef<SVGGElement>(null);
   const goblin = useRef<SVGGElement>(null);
   const goblinHp = useRef<SVGRectElement>(null);
   const coin = useRef<SVGGElement>(null);
@@ -27,6 +31,9 @@ export function DemoScene() {
       hero: hero.current ?? undefined,
       heroArm: heroArm.current ?? undefined,
       heroBody: heroBody.current ?? undefined,
+      heroArmBack: heroArmBack.current ?? undefined,
+      heroLegFront: heroLegFront.current ?? undefined,
+      heroLegBack: heroLegBack.current ?? undefined,
       goblin: goblin.current ?? undefined,
       goblinHp: goblinHp.current ?? undefined,
       coin: coin.current ?? undefined,
@@ -134,26 +141,15 @@ export function DemoScene() {
             <path d="M-11 -7 L2 -1 L-6 1 L9 8" className={styles.spark} />
           </g>
 
-          {/* Герой. Внешняя группа — положение, внутренние — суставы. */}
+          {/* Герой. Внешняя группа — положение, суставы внутри HeroSprite. */}
           <g ref={hero}>
-            <g ref={heroBody}>
-              <path d="M-4 -16 L-11 -14 L-8 6 L-3 2 Z" className={styles.cape} />
-              <rect x="-5" y="1" width="4" height="13" rx="1.6" className={styles.legs} />
-              <rect x="1" y="1" width="4" height="13" rx="1.6" className={styles.legs} />
-              <path d="M-6 -3 L-9 6 L-5 7 L-3 -2 Z" className={styles.armBack} />
-              <rect x="-6" y="-16" width="12" height="18" rx="4" className={styles.torso} />
-              <circle cy="-22" r="6.4" className={styles.head} />
-              <path d="M-6.6 -24 A6.6 6.6 0 0 1 6.6 -24 Z" className={styles.helmet} />
-              {/* Плечо: группа стоит в точке сустава, поэтому rotate крутит
-                  руку вместе с мечом — отдельной анимации у оружия нет. */}
-              <g transform="translate(2 -12)">
-                <g ref={heroArm}>
-                  <rect x="-2" y="-1" width="4" height="12" rx="2" className={styles.arm} />
-                  <rect x="-4.5" y="10" width="9" height="2.6" rx="1.2" className={styles.guard} />
-                  <rect x="-1.4" y="12" width="2.8" height="17" rx="1.4" className={styles.blade} />
-                </g>
-              </g>
-            </g>
+            <HeroSprite
+              body={heroBody}
+              armFront={heroArm}
+              armBack={heroArmBack}
+              legFront={heroLegFront}
+              legBack={heroLegBack}
+            />
           </g>
         </svg>
 
