@@ -79,7 +79,8 @@ cd backend && .venv/Scripts/python -m pytest && .venv/Scripts/python -m ruff che
 коммитится:
 
 ```bash
-backend/.venv/Scripts/python tools/sprites.py hero
+backend/.venv/Scripts/python tools/sprites.py hero    # части персонажа
+backend/.venv/Scripts/python tools/sprites.py items   # предметы из assets/src/<слот>/
 ```
 
 ## Раскладка

@@ -1,0 +1,21 @@
+{
+  "image": "items.png",
+  "cell": 160,
+  "size": [
+    20,
+    68
+  ],
+  "frames": {
+    "steel_sword": {
+      "x": 2,
+      "y": 2,
+      "w": 16,
+      "h": 64,
+      "pivot": [
+        8.0,
+        49.9
+      ],
+      "slot": "weapon"
+    }
+  }
+}

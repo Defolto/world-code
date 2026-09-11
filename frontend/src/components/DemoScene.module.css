@@ -121,10 +121,6 @@
   rx: 4;
 }
 
-/* Герой — картинки из атласа (HeroSprite), кодом только меч-заглушка */
-.guard { fill: var(--gold); }
-.blade { fill: #ccd9ea; }
-
 /* Гоблин */
 .goblinSkin { fill: #6d9c46; }
 .goblinBody { fill: #47632f; }

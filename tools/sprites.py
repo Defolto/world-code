@@ -14,9 +14,11 @@
 
     backend/.venv/Scripts/python tools/sprites.py hero
     backend/.venv/Scripts/python tools/sprites.py hero --preview out.png
+    backend/.venv/Scripts/python tools/sprites.py items
 
-Результат — frontend/src/assets/sprites/hero.png и hero.json. Атлас
-коммитится: сборка фронтенда не должна зависеть от Python-инструментов.
+Результат — frontend/src/assets/sprites/hero.png + hero.json и
+items.png + items.json. Атласы коммитятся: сборка фронтенда не должна
+зависеть от Python-инструментов.
 """
 
 from __future__ import annotations
@@ -87,6 +89,23 @@ LAYERS = ["arm_back", "leg_back", "leg_front", "torso", "head", "arm_front"]
 DIM = {"arm_back": 0.8, "leg_back": 0.8}
 
 PAD = 2
+
+# ─────────────────────────── Предметы ───────────────────────────
+#
+# Предмет лежит в assets/src/<слот>/<id>.png, один на картинку. Размер
+# задаёт холст слота, а не картинка: модель рисует предмет во весь кадр,
+# и «в масштабе референса» не держит — меч выходил ростом с героя.
+# Высота — в пикселях атласа, точка крепления — правило по слоту:
+#   "bottom"  — центр нижнего ряда (шлем на макушку, доспех на бедро);
+#   "top"     — центр верхнего ряда (сапог, плащ за плечи);
+#   ("grip", k) — кисть на рукояти: центр по ширине, k высоты от низа.
+SLOTS = {
+    "weapon": (64, ("grip", 0.22)),
+    "helmet": (30, "bottom"),
+    "armor": (44, "bottom"),
+    "boots": (14, "top"),
+    "cape": (60, "top"),
+}
 
 
 # ─────────────────────────── Вырезание фона ───────────────────────────
@@ -174,15 +193,27 @@ def trim(rgba: np.ndarray) -> np.ndarray:
     return rgba[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
 
 
-def pivot_of(rgba: np.ndarray, where: str) -> tuple[float, float]:
+def pivot_of(rgba: np.ndarray, where: str | tuple[str, float]) -> tuple[float, float]:
     """Центр крайнего непрозрачного ряда: у ноги и руки — верх, у головы
-    и торса — низ. Это и есть сустав: бедро, плечо, шея, подол."""
+    и торса — низ. Это и есть сустав: бедро, плечо, шея, подол.
+    ("grip", k) — точка на оси предмета на k высоты от нижнего края."""
     alpha = rgba[..., 3] > 64
+    if isinstance(where, tuple):
+        _, k = where
+        return (rgba.shape[1] / 2, rgba.shape[0] * (1 - k))
     row = 0 if where == "top" else alpha.shape[0] - 1
     xs = np.where(alpha[row])[0]
     if len(xs) == 0:
         return (rgba.shape[1] / 2, float(row))
     return ((xs.min() + xs.max()) / 2 + 0.5, float(row) + (0 if where == "top" else 1))
+
+
+def fit(rgba: np.ndarray, target_h: int) -> Image.Image:
+    """Обрезать по альфе и привести к высоте, сохранив пропорции."""
+    piece = trim(rgba)
+    scale = target_h / piece.shape[0]
+    img = Image.fromarray(piece.astype(np.uint8), "RGBA")
+    return img.resize((max(1, round(piece.shape[1] * scale)), target_h), Image.Resampling.LANCZOS)
 
 
 def cut_sheet(path: Path) -> list[Part]:
@@ -193,16 +224,12 @@ def cut_sheet(path: Path) -> list[Part]:
 
     parts = []
     for name, (x0, y0, x1, y1) in zip(SHEET_ORDER, boxes, strict=True):
-        piece = trim(rgba[y0:y1, x0:x1])
+        piece = rgba[y0:y1, x0:x1]
         target_h, where = CANON[name]
-        scale = target_h / piece.shape[0]
         if name in DIM:
             piece = piece.copy()
             piece[..., :3] *= DIM[name]
-        img = Image.fromarray(piece.astype(np.uint8), "RGBA")
-        img = img.resize(
-            (max(1, round(piece.shape[1] * scale)), target_h), Image.Resampling.LANCZOS
-        )
+        img = fit(piece, target_h)
         if name.startswith("leg_"):
             img = img.crop((0, HEM_BELOW_HIP - LEG_HIDDEN, img.width, img.height))
         parts.append(Part(name, img, pivot_of(np.asarray(img), where)))
@@ -317,14 +344,53 @@ def build_hero(preview_path: Path | None) -> None:
         print(f"превью: {preview_path}")
 
 
+def build_items() -> None:
+    parts: list[Part] = []
+    slots: dict[str, str] = {}
+    for slot, (target_h, where) in SLOTS.items():
+        for path in sorted((SRC / slot).glob("*.png")):
+            rgba = key_magenta(np.asarray(Image.open(path).convert("RGB")))
+            img = fit(rgba, target_h)
+            parts.append(Part(path.stem, img, pivot_of(np.asarray(img), where)))
+            slots[path.stem] = slot
+    if not parts:
+        sys.exit(f"нет предметов: положите PNG в {SRC}/<слот>/")
+
+    atlas, frames = pack(parts)
+    for name, frame in frames.items():
+        frame["slot"] = slots[name]
+    OUT.mkdir(parents=True, exist_ok=True)
+    atlas.save(OUT / "items.png", optimize=True)
+    (OUT / "items.json").write_text(
+        json.dumps(
+            {
+                "image": "items.png",
+                "cell": CELL,
+                "size": [atlas.width, atlas.height],
+                "frames": frames,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    print(
+        f"{len(parts)} предм. → {OUT.relative_to(ROOT)}/items.png {atlas.size}: {', '.join(frames)}"
+    )
+
+
 def main() -> None:
     # Консоль Windows по умолчанию в cp1251 и падает на стрелках в выводе
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("what", choices=["hero"], help="что собирать")
+    ap.add_argument("what", choices=["hero", "items"], help="что собирать")
     ap.add_argument("--preview", type=Path, help="сохранить собранного героя в PNG для проверки")
     args = ap.parse_args()
-    build_hero(args.preview)
+    if args.what == "hero":
+        build_hero(args.preview)
+    else:
+        build_items()
 
 
 if __name__ == "__main__":

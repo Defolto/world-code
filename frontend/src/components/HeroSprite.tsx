@@ -1,10 +1,12 @@
 import type { RefObject } from "react";
 import atlasUrl from "../assets/sprites/hero.png";
 import rig from "../assets/sprites/hero.json";
+import itemsUrl from "../assets/sprites/items.png";
+import items from "../assets/sprites/items.json";
 import { CELL } from "../scene/demoPlayer";
-import styles from "./DemoScene.module.css";
 
 type PartName = keyof typeof rig.frames;
+type ItemName = keyof typeof items.frames;
 
 /**
  * Герой из картинок на скелете. Части — вырезки из атласа, каждая лежит
@@ -23,6 +25,22 @@ function Part({ name }: { name: PartName }) {
     <svg x={-f.pivot[0]} y={-f.pivot[1]} width={f.w} height={f.h} viewBox={`${f.x} ${f.y} ${f.w} ${f.h}`}>
       <image href={atlasUrl} width={rig.size[0]} height={rig.size[1]} />
     </svg>
+  );
+}
+
+/**
+ * Предмет из атласа предметов, точка крепления — в начале координат.
+ * Оружие в атласе стоит клинком вверх (так его рисует модель); в кисти
+ * оно развёрнуто вдоль руки, клинком вниз, — поэтому rotate(180).
+ */
+function Item({ name }: { name: ItemName }) {
+  const f = items.frames[name];
+  return (
+    <g transform={f.slot === "weapon" ? "rotate(180)" : undefined}>
+      <svg x={-f.pivot[0]} y={-f.pivot[1]} width={f.w} height={f.h} viewBox={`${f.x} ${f.y} ${f.w} ${f.h}`}>
+        <image href={itemsUrl} width={items.size[0]} height={items.size[1]} />
+      </svg>
+    </g>
   );
 }
 
@@ -55,8 +73,8 @@ interface HeroSpriteProps {
   legBack: RefObject<SVGGElement | null>;
 }
 
-// Кисть — на нижнем конце руки, там висит оружие
-const HAND_Y = rig.frames.arm_front.h;
+// Кисть — у нижнего конца руки, чуть выше края картинки: там ладонь
+const HAND_Y = rig.frames.arm_front.h - 4;
 
 export function HeroSprite({ body, armFront, armBack, legFront, legBack }: HeroSpriteProps) {
   const scale = CELL / rig.cell;
@@ -75,10 +93,9 @@ export function HeroSprite({ body, armFront, armBack, legFront, legBack }: HeroS
         <Joint name="torso" />
         <Joint name="head" />
         <Joint name="arm_front" jointRef={armFront}>
-          {/* Меч — заглушка до первого предмета из конвейера: рисуем
-              кодом, но уже в масштабе атласа и в кисти, как ляжет картинка */}
-          <rect x="-9" y={HAND_Y - 4} width="18" height="4" rx="2" className={styles.guard} />
-          <rect x="-3" y={HAND_Y} width="6" height="36" rx="3" className={styles.blade} />
+          <g transform={`translate(0 ${HAND_Y})`}>
+            <Item name="steel_sword" />
+          </g>
         </Joint>
       </g>
     </g>
