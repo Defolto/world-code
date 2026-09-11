@@ -12,11 +12,14 @@
 
 Запуск из корня репозитория:
 
-    backend/.venv/Scripts/python tools/sprites.py hero
-    backend/.venv/Scripts/python tools/sprites.py hero --preview out.png
+    backend/.venv/Scripts/python tools/sprites.py characters
+    backend/.venv/Scripts/python tools/sprites.py characters --preview <каталог>
     backend/.venv/Scripts/python tools/sprites.py items
 
-Результат — frontend/src/assets/sprites/hero.png + hero.json и
+Персонажи — по листу разбивки на каждого: assets/src/characters/<id>/parts.png.
+Все в один атлас: у всех один риг, отличаются только картинки.
+
+Результат — frontend/src/assets/sprites/characters.png + characters.json и
 items.png + items.json. Атласы коммитятся: сборка фронтенда не должна
 зависеть от Python-инструментов.
 """
@@ -307,27 +310,49 @@ def preview(parts: dict[str, Part], rig: dict[str, list[float]], path: Path, zoo
     canvas.resize((CELL * zoom, CELL * zoom), Image.Resampling.NEAREST).save(path)
 
 
-def build_hero(preview_path: Path | None) -> None:
-    sheet = SRC / "reference" / "hero_parts.png"
-    parts = cut_sheet(sheet)
-    by_name = {p.name: p for p in parts}
-    rig = build_rig(by_name)
-    atlas, frames = pack(parts)
+def build_characters(preview_dir: Path | None) -> None:
+    # Эталон — первым: он же персонаж по умолчанию в демке
+    sheets = sorted(
+        (SRC / "characters").glob("*/parts.png"), key=lambda p: (p.parent.name != "hero", p)
+    )
+    if not sheets:
+        sys.exit(f"нет персонажей: положите лист разбивки в {SRC}/characters/<id>/parts.png")
+
+    all_parts: list[Part] = []
+    characters: dict[str, dict] = {}
+    for sheet in sheets:
+        cid = sheet.parent.name
+        parts = cut_sheet(sheet)
+        by_name = {p.name: p for p in parts}
+        rig = build_rig(by_name)
+        feet = feet_y(by_name, rig)
+        top = min(rig[n][1] - by_name[n].pivot[1] for n in by_name)
+        characters[cid] = {
+            "body": {"top": round(top, 1), "feet": round(feet, 1)},
+            "rig": {k: [round(v[0], 1), round(v[1], 1)] for k, v in rig.items()},
+            "parts": [p.name for p in parts],
+        }
+        # В общем атласе части разных персонажей различаются префиксом
+        all_parts.extend(Part(f"{cid}/{p.name}", p.image, p.pivot) for p in parts)
+        print(f"{sheet.relative_to(ROOT)}: тело {top:.0f}…{feet:.0f}")
+        if preview_dir:
+            preview_dir.mkdir(parents=True, exist_ok=True)
+            preview(by_name, rig, preview_dir / f"{cid}.png")
+
+    atlas, frames = pack(all_parts)
+    for cid, char in characters.items():
+        char["frames"] = {name: frames[f"{cid}/{name}"] for name in char.pop("parts")}
 
     OUT.mkdir(parents=True, exist_ok=True)
-    atlas.save(OUT / "hero.png", optimize=True)
-    feet = feet_y(by_name, rig)
-    top = min(rig[n][1] - by_name[n].pivot[1] for n in by_name)
-    (OUT / "hero.json").write_text(
+    atlas.save(OUT / "characters.png", optimize=True)
+    (OUT / "characters.json").write_text(
         json.dumps(
             {
-                "image": "hero.png",
+                "image": "characters.png",
                 "cell": CELL,
                 "size": [atlas.width, atlas.height],
-                "body": {"top": round(top, 1), "feet": round(feet, 1)},
                 "layers": LAYERS,
-                "rig": {k: [round(v[0], 1), round(v[1], 1)] for k, v in rig.items()},
-                "frames": frames,
+                "characters": characters,
             },
             ensure_ascii=False,
             indent=2,
@@ -335,13 +360,9 @@ def build_hero(preview_path: Path | None) -> None:
         + "\n",
         encoding="utf-8",
     )
-    print(
-        f"{sheet.relative_to(ROOT)} → {OUT.relative_to(ROOT)}/hero.png "
-        f"{atlas.size}, тело {top:.0f}…{feet:.0f}"
-    )
-    if preview_path:
-        preview(by_name, rig, preview_path)
-        print(f"превью: {preview_path}")
+    print(f"{len(characters)} перс. → {OUT.relative_to(ROOT)}/characters.png {atlas.size}")
+    if preview_dir:
+        print(f"превью: {preview_dir}")
 
 
 def build_items() -> None:
@@ -384,11 +405,13 @@ def main() -> None:
     # Консоль Windows по умолчанию в cp1251 и падает на стрелках в выводе
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("what", choices=["hero", "items"], help="что собирать")
-    ap.add_argument("--preview", type=Path, help="сохранить собранного героя в PNG для проверки")
+    ap.add_argument("what", choices=["characters", "items"], help="что собирать")
+    ap.add_argument(
+        "--preview", type=Path, help="каталог: сохранить каждого собранного персонажа в PNG"
+    )
     args = ap.parse_args()
-    if args.what == "hero":
-        build_hero(args.preview)
+    if args.what == "characters":
+        build_characters(args.preview)
     else:
         build_items()
 

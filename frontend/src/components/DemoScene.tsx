@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CELL, COLS, DISPLAY_CELL, DemoPlayer, ROW, ROWS, type SceneRefs } from "../scene/demoPlayer";
 import { CODE_LINES, COIN_COL, GOBLIN_COL, HERO_START_COL } from "../scene/demoScript";
-import { HeroSprite } from "./HeroSprite";
+import { CHARACTERS, CharacterFace, HeroSprite, type CharacterId } from "./HeroSprite";
 import styles from "./DemoScene.module.css";
 
 /**
@@ -25,6 +25,8 @@ export function DemoScene() {
 
   const [line, setLine] = useState(1);
   const [coins, setCoins] = useState(0);
+  // Персонаж — визуальный выбор: риг общий, плеер о смене не знает
+  const [character, setCharacter] = useState<CharacterId>(CHARACTERS[0]);
 
   useEffect(() => {
     const refs: Partial<SceneRefs> = {
@@ -147,6 +149,7 @@ export function DemoScene() {
           {/* Герой. Внешняя группа — положение, суставы внутри HeroSprite. */}
           <g ref={hero}>
             <HeroSprite
+              character={character}
               body={heroBody}
               armFront={heroArm}
               armBack={heroArmBack}
@@ -163,6 +166,22 @@ export function DemoScene() {
           <span className={styles.hudItem}>
             строка {line + 1} из {CODE_LINES.length}
           </span>
+          {CHARACTERS.length > 1 && (
+            <span className={`${styles.hudItem} ${styles.faces}`} role="radiogroup" aria-label="Персонаж">
+              {CHARACTERS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={id === character}
+                  className={id === character ? `${styles.face} ${styles.faceActive}` : styles.face}
+                  onClick={() => setCharacter(id)}
+                >
+                  <CharacterFace character={id} />
+                </button>
+              ))}
+            </span>
+          )}
         </div>
       </div>
     </div>

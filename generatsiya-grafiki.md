@@ -113,8 +113,10 @@ same framing as the reference. 1024x1024.
 
 ### C. Разбивка на части
 
-Референс — целый персонаж (A или B). Швы поправляются руками один раз
-на персонажа, это нормально.
+Референс — целый персонаж (A или B). Результат кладётся в
+`assets/src/characters/<id>/parts.png`, `id` — латиницей, он же имя
+персонажа в атласе. Швы поправляются руками один раз на персонажа, это
+нормально.
 
 ```
 Using the attached character, redraw it as separate body parts laid out on
@@ -126,6 +128,30 @@ straight]. Each part complete and not occluded, drawn as if seen from the
 side facing right. Plain solid #FF00FF background, no labels, no grid
 lines, no text.
 ```
+
+### C′. Другой персонаж сразу частями
+
+Короткий путь вместо B + C: референс — лист разбивки эталона
+`characters/hero/parts.png`, модель повторяет раскладку, масштаб и стиль,
+меняя только внешность. Если раскладка или масштаб поплыли — обратно к
+B + C, там два шага, но каждый надёжнее.
+
+```
+Using the attached parts sheet as an exact template, draw the same six
+body parts for a different character, in the same positions on the same
+3x2 grid, at exactly the same scale, same pose of each part, same flat
+vector cartoon style with thick dark outline and three-tone cel shading.
+Character: {описание}. Parts: top row — [head with hair and neck], [torso
+with tunic and belt, no arms, no head], [front arm with hand, straight,
+hanging down]; bottom row — [back arm with hand, straight], [front leg
+with trouser and shoe, straight], [back leg with trouser and shoe,
+straight]. Side view facing right. Plain solid #FF00FF background, no
+labels, no grid lines, no text.
+```
+
+Проверить: части того же размера, что на эталонном листе (положить
+рядом), профиль вправо, шея не спрятана под волосами — она нужна для
+стыка с торсом.
 
 ### D. Предмет
 
@@ -180,7 +206,9 @@ solid #FF00FF background, nothing else in the image, item centered.
 5. **Атлас**: все части в один PNG плюс JSON с вырезками, точками крепления и позициями суставов. Лежит в `frontend/src/assets/sprites/` и коммитится — сборка фронтенда не зависит от Python. Vite добавляет хэш в имя, кэш навсегда, как у остальной статики.
 6. **CI** (ещё нет): каждая комбинация персонаж × предметы рендерится и проверяется на габарит клетки.
 
-Части персонажа — `sprites.py hero`, предметы — `sprites.py items`:
+Персонажи — `sprites.py characters`: все листы `characters/<id>/parts.png`
+в один атлас, риг общий, в демке — переключатель по лицам. Предметы —
+`sprites.py items`:
 всё из `assets/src/<слот>/*.png` в `items.png` + `items.json`, имя файла —
 id предмета, папка — слот.
 
@@ -195,4 +223,4 @@ API): JPEG размывает край на пурпурном фоне, и вы
 1. ~~Эталонный персонаж (A)~~ — принят, `hero_base.png`.
 2. ~~Разбивка эталона на части (C), посадить на скелет, проверить позы~~ — `hero_parts.png`, герой ходит и бьёт в демке на главной.
 3. Пять предметов по одному на слот (D), посадить, выставить `offset`. Меч — есть (`steel_sword`), в кисти в демке.
-4. Только теперь: остальные персонажи (B) и предметы потоком.
+4. Только теперь: остальные персонажи (C′ или B + C) и предметы потоком.
