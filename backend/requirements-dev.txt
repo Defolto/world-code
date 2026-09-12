@@ -9,3 +9,8 @@ ruff==0.8.4
 # окружения; на сервер тоже не уезжает
 pillow==12.3.0
 numpy==2.4.6
+
+# Схема уровней и автосолвер (tools/level_schema.py, simulator/tests).
+# В Pyodide не попадают: симулятор — только stdlib
+pyyaml==6.0.3
+pydantic==2.13.5

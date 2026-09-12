@@ -1,0 +1,56 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-05
+lesson: 1
+title: Змейка
+brief: >-
+  Дорога петляет между стенами. Проведи героя к флагу — пригодятся все
+  четыре команды. Длинный путь — не страшно: одна строка, один шаг.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "F": flag
+  grid: |
+    #########
+    #@..#...#
+    ##.##.#.#
+    #.....#F#
+    #########
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+
+starter: |
+  # Прямо вправо не пройти — стена. Ищи проход
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.move_down()
+  hero.move_down()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_up()
+  hero.move_up()
+  hero.move_right()
+  hero.move_right()
+  hero.move_down()
+  hero.move_down()
+
+goals:
+  - reach: [7, 3]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: Пройди путь пальцем по карте и запиши каждый шаг отдельной строкой.
+  - after_fails: 3
+    text: Вправо, вниз, вниз, три раза вправо, вверх, вверх, дважды вправо, вниз, вниз.

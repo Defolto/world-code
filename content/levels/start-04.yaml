@@ -1,0 +1,49 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-04
+lesson: 1
+title: За угол
+brief: >-
+  Дорога поворачивает. Сначала вправо до конца коридора, потом вниз
+  к флагу. Теперь у героя все четыре команды.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "F": flag
+  grid: |
+    #######
+    #@...##
+    ####.##
+    ####F.#
+    #######
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+
+starter: |
+  # Вправо до поворота, потом вниз
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_down()
+  hero.move_down()
+
+goals:
+  - reach: [4, 3]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: Если герой упёрся в стену, он остаётся на месте. Посмотри, где проход вниз.
+  - after_fails: 3
+    text: Три шага вправо, два вниз.

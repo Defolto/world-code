@@ -1,0 +1,24 @@
+/* Пол и стены — картинки из атласа (frontend/src/assets/tiles/dungeon.png),
+   здесь только то, что рисуется поверх процедурно: тени, валуны, темнота.
+
+   Палитра локации — здесь, а не в токенах UI: это цвета мира, а не
+   интерфейса. Валуны подобраны под скалу с листа (#394551), чтобы
+   сидеть на ней, а не поверх. */
+.tiles {
+  --rock-stone: #313c48;
+  --rock-light: #46525f;
+  --shadow: #05070a;
+  /* Пустота за кольцом скалы — тот же цвет, что фон окна камеры (.viewport),
+     иначе при отдалении виден край сцены */
+  --void: var(--bg-sunken);
+}
+
+.boulder {
+  fill: var(--rock-stone);
+  stroke: color-mix(in srgb, var(--shadow) 30%, var(--rock-stone));
+  stroke-width: 1.2;
+}
+
+.boulderLight {
+  fill: var(--rock-light);
+}

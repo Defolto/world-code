@@ -1,0 +1,56 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-06
+lesson: 1
+title: Ворота
+brief: >-
+  На дороге ворота. Они открываются, если постоять рядом неподвижно:
+  число на воротах — сколько ходов. Постоять один ход умеет hero.wait().
+  Стучаться бесполезно: шаг в закрытые ворота сбивает счёт.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "|": gate
+    "F": flag
+  grid: |
+    ########
+    #@.|..F#
+    ########
+
+objects:
+  gate:
+    waits_to_open: 2
+
+api:
+  - hero.move_right
+  - hero.wait
+
+starter: |
+  # Ворота закрыты. Сколько ходов постоять рядом?
+  hero.move_right()
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.wait()
+  hero.wait()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+
+goals:
+  - reach: [6, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Подойди к воротам вплотную и посмотри на число: столько раз подряд
+      напиши hero.wait().
+  - after_fails: 3
+    text: Шаг вправо, два раза hero.wait(), и дальше четыре шага вправо.

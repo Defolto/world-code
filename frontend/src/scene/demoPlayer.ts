@@ -15,14 +15,12 @@ import {
   type Step,
 } from "./demoScript";
 
-export const CELL = 44;
+import { CELL } from "./grid";
+
+export { CELL, DISPLAY_CELL } from "./grid";
 export const COLS = 9;
 export const ROWS = 5;
 export const ROW = 2;
-
-// Размер клетки на экране в CSS-пикселях — решение из generatsiya-grafiki.md.
-// CELL выше — внутренние единицы viewBox, на экран их переводит размер SVG.
-export const DISPLAY_CELL = 80;
 
 export interface SceneRefs {
   hero: SVGGElement;

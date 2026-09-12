@@ -1,0 +1,43 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-03
+lesson: 1
+title: Наверх
+brief: >-
+  Флаг над головой. hero.move_up() — шаг вверх, hero.move_down() — шаг
+  вниз. Поднимись к флагу.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "F": flag
+  grid: |
+    #####
+    #.F.#
+    #...#
+    #...#
+    #.@.#
+    #####
+
+api:
+  - hero.move_up
+  - hero.move_down
+
+starter: |
+  hero.move_up()
+
+solution: |
+  hero.move_up()
+  hero.move_up()
+  hero.move_up()
+
+goals:
+  - reach: [2, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: Вверх — это к верхнему краю карты. Считай клетки от героя до флага.

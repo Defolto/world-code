@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DemoScene } from "./DemoScene";
 import styles from "./Landing.module.css";
 
@@ -38,8 +37,6 @@ const STATS = [
 ] as const;
 
 export function Landing() {
-  const [asked, setAsked] = useState(false);
-
   return (
     <>
       <header className={styles.header}>
@@ -51,7 +48,7 @@ export function Landing() {
           <nav className={styles.nav}>
             <a href="#how">Как это работает</a>
             <a href="#medals">Медали</a>
-            <a href="#start" className={styles.navCta}>
+            <a href="/play/" className={styles.navCta}>
               Начать
             </a>
           </nav>
@@ -72,7 +69,7 @@ export function Landing() {
               твоя строчка.
             </p>
             <div className={styles.actions}>
-              <a href="#start" className={styles.btnPrimary}>
+              <a href="/play/" className={styles.btnPrimary}>
                 Начать бесплатно
               </a>
               <a href="#how" className={styles.btnGhost}>
@@ -186,18 +183,12 @@ export function Landing() {
                 <li>Ни телефона, ни настоящего имени, ни адреса</li>
               </ul>
 
-              <button
-                type="button"
-                className={styles.btnBig}
-                onClick={() => setAsked(true)}
-              >
+              <a href="/play/" className={styles.btnBig}>
                 Начать бесплатно
-              </button>
+              </a>
 
-              <p className={styles.startNote} role="status">
-                {asked
-                  ? "Мы ещё строим первый уровень. Скоро тут откроется лес с гоблинами."
-                  : "После третьей решённой задачи предложим сохранить прогресс."}
+              <p className={styles.startNote}>
+                После третьей решённой задачи предложим сохранить прогресс.
               </p>
             </div>
           </div>

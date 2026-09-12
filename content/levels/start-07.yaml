@@ -1,0 +1,82 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-07
+lesson: 1
+title: Две решётки
+brief: >-
+  Ворот двое, и вторые тяжелее: рядом с ними придётся постоять дольше.
+  Число на воротах — сколько ходов. Стоять нужно вплотную и не двигаясь:
+  любой шаг, даже в стену, начинает счёт заново.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "|": gate
+    ":": heavy_gate
+    "F": flag
+  grid: |
+    #########
+    #@.|....#
+    #######.#
+    #..F.:..#
+    #########
+
+objects:
+  gate:
+    waits_to_open: 2
+  heavy_gate:
+    waits_to_open: 3
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.wait
+
+starter: |
+  # Первые ворота ты уже проходил. Дальше — вниз и налево
+  hero.move_right()
+  hero.wait()
+  hero.wait()
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.wait()
+  hero.wait()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_down()
+  hero.move_down()
+  hero.move_left()
+  hero.wait()
+  hero.wait()
+  hero.wait()
+  hero.move_left()
+  hero.move_left()
+  hero.move_left()
+
+goals:
+  - reach: [3, 3]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Дойди до вторых ворот вплотную и посмотри на число: столько раз
+      подряд напиши hero.wait().
+  - after_fails: 2
+    text: >-
+      Счёт сбился? Между hero.wait() не должно быть шагов — ни удачных,
+      ни в стену.
+  - after_fails: 4
+    text: >-
+      Вправо, два раза wait, пять раз вправо, два раза вниз, влево,
+      три раза wait, три раза влево.

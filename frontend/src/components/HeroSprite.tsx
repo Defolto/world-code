@@ -3,7 +3,7 @@ import atlasUrl from "../assets/sprites/characters.png";
 import atlas from "../assets/sprites/characters.json";
 import itemsUrl from "../assets/sprites/items.png";
 import items from "../assets/sprites/items.json";
-import { CELL } from "../scene/demoPlayer";
+import { CELL } from "../scene/grid";
 
 export type CharacterId = keyof typeof atlas.characters;
 export const CHARACTERS = Object.keys(atlas.characters) as CharacterId[];

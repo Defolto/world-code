@@ -1,0 +1,41 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-02
+lesson: 1
+title: Обратно
+brief: >-
+  Флаг остался позади. hero.move_left() — шаг влево. Сколько шагов
+  до флага — посчитай по клеткам.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "F": flag
+  grid: |
+    #######
+    #.F..@#
+    #######
+
+api:
+  - hero.move_right
+  - hero.move_left
+
+starter: |
+  # Теперь идём налево
+  hero.move_left()
+
+solution: |
+  hero.move_left()
+  hero.move_left()
+  hero.move_left()
+
+goals:
+  - reach: [2, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: Между героем и флагом две пустые клетки. Значит, шагов — три.

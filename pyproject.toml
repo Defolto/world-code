@@ -1,0 +1,18 @@
+# Симулятор и контентные проверки. У бэкенда свой pyproject в backend/:
+# там другая нижняя граница Python и другие зависимости.
+#
+# Запуск из корня:  backend/.venv/Scripts/python -m pytest
+#                   backend/.venv/Scripts/python -m ruff check simulator tools
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["simulator/tests"]
+
+[tool.ruff]
+line-length = 100
+# Симулятор исполняется в Pyodide (Python 3.14) и в CI, но пишется и
+# гоняется локально на 3.11 — она и есть фактическая нижняя граница.
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

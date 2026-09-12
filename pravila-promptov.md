@@ -176,6 +176,76 @@ about 60% of the image height. 1024x1024.
 Враг смотрит **влево**, навстречу герою — единственный случай, где не
 «facing right».
 
+### F. Плитки локации
+
+Не персонаж и не предмет, поэтому правила 2–4 здесь не действуют: фон
+не пурпурный, вид сверху, на картинке много всего сразу. Модель не
+умеет рисовать стыкующиеся куски по отдельности, поэтому ей отдаётся
+**карта-шаблон** `assets/src/tiles/template.png` (делает
+`tools/tiles.py template`): сетка 8×8, тёмное — скала, светлое — пол,
+средний тон — облицовка коридора с угловыми блоками и швами. Модель
+раскрашивает то, что видит, поэтому в шаблоне показано всё, что она
+должна повторить, и ничего из того, что не должна: ни сетки через
+скалу, ни теней — тени, валуны и уход в темноту рисует рендер.
+Референс — сам шаблон; для второй и следующих локаций приложить ещё и
+готовый лист первой, чтобы держался стиль.
+
+```
+Using the attached grayscale layout as an exact map, paint a {dungeon}
+tileset for a kids' coding game, seen straight from above (top-down, no
+perspective). The image is an 8x8 grid of equal square cells: keep every
+edge exactly where it is.
+Three materials, each exactly where the layout shows it:
+1. The dark areas are solid rock — the mass the dungeon is cut into.
+Paint it as plain dark stone, nearly flat, with only faint small
+texture and no bright details: it is repeated over large areas.
+2. The mid-gray bands are the dressed-stone lining of the corridor
+walls: one row of cut stone blocks, exactly as wide as the band, with a
+mortar seam at every dark line in the layout and nowhere else. The band
+looks the same on all four sides of a corridor. Each small square at a
+corner is a single corner stone. The edge of the band that touches the
+floor may have a slightly lighter highlight.
+3. The light areas are the floor: flat flagstones, identical
+everywhere, laid on a regular pattern aligned to the grid so that any
+floor cell can be swapped with any other; the thin grid lines are only
+a guide, do not paint them.
+No shadows, no lighting gradients, no shading between areas — the game
+draws shadows itself.
+Style: flat vector cartoon, a thick dark outline only along the border
+between the lining and the floor, three-tone cel shading, no gradients,
+no textures, no glow. Palette: {cool dark blue-gray rock, cool mid
+blue-gray lining, warm light sand-gray floor}; the floor is clearly
+lighter and warmer than the stone. No characters, no props, no torches,
+no doors, no text, no labels. Fill the whole image edge to edge. Square
+output, 2048x2048.
+```
+
+В фигурных скобках — локация и палитра; всё остальное менять не надо.
+Ориентир палитры — переменные в `frontend/src/components/Tiles.module.css`.
+Просить 2K: в атлас идёт 160 px на клетку, из 1024 их приходится
+растягивать. Результат → `assets/src/tiles/<локация>/sheet.png`, дальше
+`tools/tiles.py build <локация>` и `preview`.
+
+Что режется из листа (клетки раскладки заданы в `tools/tiles.py`):
+скала — центр блока 3×3; полоса — верхний край блока; полоса при угле и
+угловой блок — левый верхний угол блока; полоса между двумя углами —
+столб; пол — нижние ряды. Всё остальное на листе — контекст для модели.
+
+Отбор — свой, глазами по превью уровней, а не по листу:
+
+- **сетка удержана**: положить лист поверх шаблона с прозрачностью —
+  границы скалы и полос совпадают с шаблоном, ничего не выползает;
+- полосы одной ширины со всех четырёх сторон, швы только там, где в
+  шаблоне; угловые блоки — цельные камни;
+- скала ровная: в превью она замощается одной клеткой, любой яркий
+  камень превратится в узор;
+- пол однородный: в превью клетки пола переставлены случайно — швы не
+  должны быть видны;
+- пол заметно светлее и теплее камня: на тёмной теме одной яркости мало;
+- нет теней и градиентов у границ — их добавит рендер, вторые будут лишними;
+- уменьшить до 80 px на клетку (превью так и рисует) — коридор читается,
+  угол — как угол.
+
 ## Отбор
 
 Одна минута на картинку, до того как класть в репозиторий:
@@ -211,3 +281,12 @@ about 60% of the image height. 1024x1024.
   Если это не задумано, прописывать возраст и `friendly face` явно.
 - **Эталон не меняется.** Смена стиля — перегенерация всех персонажей
   и предметов, а не одного.
+- **Плитки: модель раскрашивает то, что видит, а не то, что написано.**
+  Первый шаблон с сеткой через стены дал «каждая клетка — отдельный
+  блок с контуром», а клетку в центре блока 3×3 модель нарисовала ямой —
+  фраза «walls merge into one masonry» не помогла. Помогло убрать линии
+  внутри стен и нарисовать в шаблоне всё, что должно быть на листе.
+- **Вид три четверти для плиток отвергнут.** Лицевая грань стены видна
+  только с юга, и коридор получался обрамлённым по-разному с разных
+  сторон, а углы ломались. Вид сверху с облицовкой по всем сторонам
+  даёт набор из пяти кусков вместо шестнадцати плиток.

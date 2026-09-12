@@ -1,0 +1,40 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-01
+lesson: 1
+title: Три шага
+brief: >-
+  Герой стоит на дороге, а флаг — в трёх шагах справа. Одна команда
+  hero.move_right() — один шаг. Доведи героя до флага.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "F": flag
+  grid: |
+    #######
+    #@..F.#
+    #######
+
+api:
+  - hero.move_right
+
+starter: |
+  # Каждая строка — один шаг героя
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+
+goals:
+  - reach: [4, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: Один вызов hero.move_right() — один шаг. Сколько шагов до флага?

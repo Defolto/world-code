@@ -1,0 +1,58 @@
+/* Естественный размер: DISPLAY_CELL на клетку. Вписывает и масштабирует
+   камера. overflow — иначе валуны, вылезающие за кольцо скалы, видны в пустоте */
+.svg {
+  display: block;
+  overflow: hidden;
+}
+
+.mark {
+  fill: none;
+  stroke: color-mix(in srgb, var(--emerald) 30%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+  rx: 4;
+}
+
+.flagPole {
+  stroke: var(--steel);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.flagCloth {
+  fill: var(--gold);
+}
+
+/* Ворота: решётка ездит вверх-вниз по CSS-переходу, состояние — data-state
+   на группе. Плеер меняет атрибут, а не рисует сам. */
+.bars {
+  stroke: var(--steel);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: transform 220ms ease-in-out;
+}
+
+[data-state="open"] .bars {
+  transform: translateY(-32px);
+}
+
+.gateFrame {
+  fill: var(--line);
+}
+
+.gateBadge circle {
+  fill: var(--bg-elev);
+  stroke: var(--steel);
+  stroke-width: 1.5;
+}
+
+[data-state="open"] .gateBadge circle {
+  stroke: var(--emerald);
+}
+
+.gateBadge text {
+  fill: var(--ink);
+  font: 700 10px var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
