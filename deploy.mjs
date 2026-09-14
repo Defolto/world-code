@@ -102,6 +102,29 @@ function run(cmd, options = {}) {
   execSync(cmd, { cwd: root, stdio: "inherit", ...options });
 }
 
+// Хостинг время от времени рвёт соединение прямо на рукопожатии
+// ("kex_exchange_identification: Connection closed by remote host") —
+// похоже на лимит новых подключений с одного адреса. Деплой открывает
+// четыре подряд, и какое-то из них случайно попадает под нож. Поэтому
+// ssh и scp повторяем. Только при коде 255: это код самого ssh «не смог
+// подключиться», а не удалённой команды, которая честно завершилась с
+// ошибкой — её повторять бессмысленно.
+const SSH_RETRIES = 5;
+const SSH_RETRY_DELAY_MS = 3000;
+
+function runSsh(cmd) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      run(cmd);
+      return;
+    } catch (err) {
+      if (err.status !== 255 || attempt >= SSH_RETRIES) throw err;
+      console.log(`Соединение оборвалось, попытка ${attempt + 1} из ${SSH_RETRIES} через ${SSH_RETRY_DELAY_MS / 1000} с…`);
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, SSH_RETRY_DELAY_MS);
+    }
+  }
+}
+
 /* ─────────────────────────── API NetAngels ─────────────────────────── */
 
 // Токен по API-ключу; живёт 24 часа, но нам хватает одного запуска
@@ -182,7 +205,7 @@ const SSH_RUN = `ssh -n ${SSH_OPTS}`;
 // ("cannot set terminal process group") и виснет, ожидая ввод со stdin.
 function remote(sshTarget, script) {
   const oneLine = script.filter(Boolean).join("; ");
-  run(`${SSH_RUN} ${sshTarget} "bash -lc '${oneLine}'"`);
+  runSsh(`${SSH_RUN} ${sshTarget} "bash -lc '${oneLine}'"`);
 }
 
 function buildFrontend() {
@@ -246,7 +269,7 @@ async function deploy() {
     `[ -d ${deployDir} ] || { echo "Нет каталога ${deployDir} на сервере"; exit 1; }`,
     `[ -x ${deployDir}/${VENV}/bin/python ] || { echo "Нет venv ${deployDir}/${VENV} — сайт создан не пресетом Python ASGI?"; exit 1; }`,
   ]);
-  run(`scp ${SSH_OPTS} "${archivePath}" ${sshTarget}:${deployDir}/${ARCHIVE}`);
+  runSsh(`scp ${SSH_OPTS} "${archivePath}" ${sshTarget}:${deployDir}/${ARCHIVE}`);
 
   console.log("\n=== 4/5 Разворачиваем и ставим зависимости ===");
   // Распаковка во временную папку: если tar упадёт, старый код цел.

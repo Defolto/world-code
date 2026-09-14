@@ -1,0 +1,98 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-02
+lesson: 2
+title: Ямы и паутина
+brief: >-
+  В коридорах преграды двух видов: яму надо перепрыгнуть —
+  hero.jump("right"), под паутиной проползти — hero.crawl("right"). В
+  скобках — направление в кавычках: "right", "left", "up" или "down".
+  В заготовке уже есть готовый кусок для первой ямы. Прочитай его:
+  hero.can_move("right") спрашивает, можно ли шагнуть вправо. Если да
+  (строки под if) — герой идёт две клетки. Иначе (строки под else) —
+  прыгает. Обе команды переносят героя на одну и ту же клетку — за
+  преградой. Повтори такой кусок для каждой преграды: у паутины вместо
+  jump — crawl, в нижнем коридоре вместо "right" — "left".
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "P": pit
+    "W": web
+    "F": flag
+  grid: |
+    #########
+    #@.P..W.#
+    #######.#
+    #F.W..P.#
+    #########
+
+objects:
+  pit:
+    jumpable: true
+  web:
+    crawlable: true
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.can_move
+  - hero.jump
+  - hero.crawl
+
+starter: |
+  # Если вправо можно шагнуть — герой идёт, иначе — прыгает
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.jump("right")
+
+solution: |
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.jump("right")
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.crawl("right")
+  hero.move_down(2)
+  if hero.can_move("left"):
+      hero.move_left(2)
+  else:
+      hero.jump("left")
+  hero.move_left()
+  if hero.can_move("left"):
+      hero.move_left(2)
+  else:
+      hero.crawl("left")
+  hero.move_left()
+
+goals:
+  - reach: [1, 3]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Скопируй кусок с if и else из заготовки и поставь его перед каждой
+      преградой. Перед этим герой должен стоять вплотную к ней — сделай
+      шаг.
+  - after_fails: 2
+    text: >-
+      Строки под if и под else начинаются с четырёх пробелов, а сами if
+      и else — с начала строки и с двоеточием на конце. У паутины в else
+      пишется hero.crawl, у ямы — hero.jump.
+  - after_fails: 4
+    text: >-
+      Шаг вправо, кусок с jump("right"). Шаг вправо, кусок с
+      crawl("right"). Два шага вниз, кусок с jump("left"). Шаг влево,
+      кусок с crawl("left"). Шаг влево — флаг.

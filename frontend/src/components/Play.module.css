@@ -39,6 +39,37 @@
   color: var(--ink-faint);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  margin-right: 6px;
+  white-space: nowrap;
+  /* Той же высоты, что кружки уровней, текст строго по их центру */
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  line-height: 1;
+}
+
+.lessonName {
+  color: var(--ink-dim);
+}
+
+/* Стрелки к соседним занятиям */
+.lessonArrow {
+  width: 26px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+  text-decoration: none;
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 6px;
+  /* Глиф стрелки сидит ниже середины строки — приподнять */
+  padding-bottom: 3px;
+}
+
+.lessonArrow:hover {
+  color: var(--ink);
+  background: var(--bg-elev);
 }
 
 .title {
@@ -47,6 +78,7 @@
 
 .levels {
   display: inline-flex;
+  align-items: center;
   gap: 4px;
 }
 
@@ -71,24 +103,6 @@
 .levelActive {
   border-color: var(--emerald);
   color: var(--emerald);
-}
-
-.engine {
-  font-size: 12px;
-  font-family: var(--mono);
-  color: var(--ink-faint);
-}
-
-.loading {
-  color: var(--gold);
-}
-
-.ready {
-  color: var(--emerald-deep);
-}
-
-.failed {
-  color: var(--crimson);
 }
 
 /* ─── Раскладка ─── */
@@ -140,6 +154,15 @@
 .brief {
   color: var(--ink);
   font-size: 15px;
+}
+
+/* Ключевое слово задания — то, что надо перенести в код как есть */
+.keyword {
+  background: color-mix(in srgb, var(--gold) 28%, transparent);
+  color: var(--ink);
+  font: 700 0.95em var(--mono);
+  padding: 1px 5px;
+  border-radius: 4px;
 }
 
 .api,
@@ -200,6 +223,9 @@
 }
 
 .runBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -209,6 +235,7 @@
   border-radius: 999px;
   padding: 7px 18px;
   cursor: pointer;
+  transition: background 200ms ease-out;
 }
 
 .runBtn:hover:not(:disabled) {
@@ -218,6 +245,45 @@
 .runBtn:disabled {
   opacity: 0.55;
   cursor: default;
+}
+
+/* Пока Python грузится — жёлтая и не бледная: это не «нельзя», а «сейчас» */
+.runBtn[data-engine="idle"],
+.runBtn[data-engine="loading"] {
+  background: var(--gold);
+  opacity: 1;
+  cursor: progress;
+}
+
+.runBtn[data-engine="failed"] {
+  background: var(--crimson);
+  color: #fff;
+  opacity: 1;
+}
+
+.runIcon {
+  font-size: 12px;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, #06120a 25%, transparent);
+  border-top-color: #06120a;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
 }
 
 .world {
@@ -256,6 +322,8 @@
   position: absolute;
   top: 0;
   left: 0;
+  /* По размеру сцены, а не окна: absolute сжался бы до ширины окна */
+  width: max-content;
   will-change: transform;
 }
 
@@ -295,6 +363,80 @@
 .zoomValue {
   min-width: 44px;
   text-align: center;
+}
+
+/* HUD героя под картой: две полоски и два числа. Цвет полоски — переменная
+   на дорожке, заливка её наследует */
+.hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--ink-dim);
+}
+
+.meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.meterTrack {
+  --meter: var(--ink-dim);
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.meter_hp {
+  --meter: var(--crimson);
+}
+
+.meter_energy {
+  --meter: var(--gold);
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--meter);
+  transition: width 240ms ease-out;
+}
+
+.meterValue {
+  min-width: 42px;
+  text-align: right;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hudStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink);
+}
+
+.hudIcon {
+  color: var(--ink-dim);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.hudCoin {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--gold) 55%, #7a4b00);
 }
 
 .controls {

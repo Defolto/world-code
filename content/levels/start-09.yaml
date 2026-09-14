@@ -1,0 +1,80 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-09
+lesson: 1
+title: Тайник
+brief: >-
+  Коридор ведёт прямо к флагу, и в нём лежит монетка. Вторая спрятана
+  сбоку, за решёткой: постой рядом с воротами, спустись, возьми её и
+  вернись. Флаг засчитают, только когда собраны обе.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "|": gate
+    "o": coin
+    "F": flag
+  grid: |
+    #########
+    #@...o.F#
+    ###|#####
+    ###o#####
+    #########
+
+objects:
+  gate:
+    waits_to_open: 2
+  coin:
+    pickable: true
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.wait
+  - hero.take
+
+starter: |
+  # Ворота — под третьей клеткой коридора
+  hero.move_right()
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.move_right()
+  hero.wait()
+  hero.wait()
+  hero.move_down()
+  hero.move_down()
+  hero.take()
+  hero.move_up()
+  hero.move_up()
+  hero.move_right()
+  hero.move_right()
+  hero.take()
+  hero.move_right()
+  hero.move_right()
+
+goals:
+  - reach: [7, 1]
+  - collect: coin
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Ворота открываются, когда стоишь вплотную: встань над ними и
+      напиши hero.wait() столько раз, сколько написано на решётке.
+  - after_fails: 2
+    text: >-
+      Дошёл до флага, а уровень не засчитан? Значит, одна из монеток
+      осталась лежать. hero.take() берёт только ту, на которой стоишь, —
+      посмотри, обе ли клетки ты прошёл с этой командой.
+  - after_fails: 4
+    text: >-
+      Два раза вправо, два раза wait, два раза вниз, hero.take(),
+      два раза вверх, два раза вправо, hero.take(), два раза вправо.

@@ -1,10 +1,17 @@
 import { useEffect, useImperativeHandle, useRef, type Ref } from "react";
+import {
+  autocompletion,
+  snippetCompletion,
+  type Completion,
+  type CompletionSource,
+} from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
 import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
 import { Compartment, EditorState, StateEffect, StateField } from "@codemirror/state";
 import { Decoration, EditorView, keymap, lineNumbers, type DecorationSet } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
+import { COMMANDS } from "../engine/commands";
 import styles from "./Editor.module.css";
 
 /**
@@ -55,6 +62,55 @@ function lineField(effect: typeof setActive, mark: Decoration) {
 const activeField = lineField(setActive, activeMark);
 const errorField = lineField(setError, errorMark);
 
+// Сниппеты синтаксиса — как в настоящей IDE: `for` разворачивается в
+// заготовку цикла, Tab прыгает по местам для заполнения (`${1:i}` —
+// первое поле с текстом-заготовкой, `${}` — где остаётся курсор). Список общий для
+// всех уровней: он не открывает ничего, что нельзя было бы набрать руками
+// (api — не запрет синтаксиса), а появляется только когда ребёнок начал
+// печатать это слово. Подписи на русском — они и есть объяснение.
+const SNIPPETS: Completion[] = [
+  snippetCompletion("for ${1:i} in range(${2:3}):\n    ${}", {
+    label: "for",
+    detail: "повторить несколько раз",
+    type: "keyword",
+  }),
+  snippetCompletion("while ${1:условие}:\n    ${}", {
+    label: "while",
+    detail: "повторять, пока верно",
+    type: "keyword",
+  }),
+  snippetCompletion("if ${1:условие}:\n    ${}", {
+    label: "if",
+    detail: "сделать, если верно",
+    type: "keyword",
+  }),
+  snippetCompletion("else:\n    ${}", { label: "else", detail: "иначе", type: "keyword" }),
+  snippetCompletion("def ${1:название}():\n    ${}", {
+    label: "def",
+    detail: "своя команда",
+    type: "keyword",
+  }),
+];
+
+/** Дополнение команд героя, открытых уровнем, плюс сниппеты синтаксиса.
+ *  Срабатывает и на `he…`, и на `hero.mo…`: подставляется вся команда
+ *  со скобками, курсор — после них. */
+function completions(api: string[]): CompletionSource {
+  // Порядок — как в api уровня и в справочнике, а не по алфавиту
+  const commands: Completion[] = api.map((name, i) => ({
+    label: `${name}()`,
+    detail: COMMANDS[name] ?? "",
+    type: "method",
+    boost: api.length - i,
+  }));
+  const options = [...commands, ...SNIPPETS];
+  return (ctx) => {
+    const word = ctx.matchBefore(/hero\.\w*|\w+/);
+    if (!word && !ctx.explicit) return null;
+    return { from: word?.from ?? ctx.pos, options, validFor: /^(hero\.)?\w*$/ };
+  };
+}
+
 // Цвета — токены из tokens.css, чтобы тема редактора менялась вместе с сайтом
 const highlight = HighlightStyle.define([
   { tag: tags.keyword, color: "var(--code-keyword)" },
@@ -83,16 +139,35 @@ const theme = EditorView.theme(
     ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
       backgroundColor: "color-mix(in srgb, var(--emerald) 22%, transparent)",
     },
+    ".cm-tooltip.cm-tooltip-autocomplete": {
+      backgroundColor: "var(--bg-elev)",
+      border: "1px solid var(--line)",
+      borderRadius: "var(--radius-sm)",
+      boxShadow: "var(--shadow)",
+      fontFamily: "var(--mono)",
+      fontSize: "13px",
+    },
+    ".cm-tooltip.cm-tooltip-autocomplete > ul > li": { padding: "4px 10px", lineHeight: "1.5" },
+    ".cm-tooltip.cm-tooltip-autocomplete > ul > li[aria-selected]": {
+      backgroundColor: "color-mix(in srgb, var(--emerald) 20%, transparent)",
+      color: "var(--ink)",
+    },
+    ".cm-completionLabel": { color: "var(--code-call)" },
+    ".cm-completionMatchedText": { textDecoration: "none", color: "var(--emerald)", fontWeight: "700" },
+    ".cm-completionDetail": { color: "var(--ink-dim)", fontFamily: "var(--sans)", fontStyle: "normal", marginLeft: "12px" },
+    ".cm-snippetField": { backgroundColor: "color-mix(in srgb, var(--gold) 22%, transparent)" },
   },
   { dark: true },
 );
 
 interface EditorProps {
   initial: string;
+  /** Команды героя, открытые уровнем, — из них собирается автодополнение */
+  api: string[];
   ref: Ref<EditorHandle>;
 }
 
-export function Editor({ initial, ref }: EditorProps) {
+export function Editor({ initial, api, ref }: EditorProps) {
   const host = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const readOnly = useRef(new Compartment());
@@ -108,6 +183,7 @@ export function Editor({ initial, ref }: EditorProps) {
         indentUnit.of("    "),
         keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
         python(),
+        autocompletion({ override: [completions(api)], icons: false }),
         syntaxHighlighting(highlight),
         theme,
         activeField,
@@ -121,7 +197,8 @@ export function Editor({ initial, ref }: EditorProps) {
       v.destroy();
       view.current = null;
     };
-    // Начальный текст читается один раз при монтировании: редактор uncontrolled
+    // Начальный текст и api читаются один раз при монтировании: редактор
+    // uncontrolled, а уровень на странице один
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

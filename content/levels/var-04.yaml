@@ -1,0 +1,91 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: var-04
+lesson: 3
+title: Сторож
+brief: >-
+  На полу мешок с монетами: hero.take() на нём возвращает не слово, а
+  число — сколько монет внутри. Дальше свиток, и на нём тоже число:
+  сколько монет надо донести до флага. Дверь стережёт сторож, и он
+  пропустит, если сказать, сколько монет ты ему отдаёшь — все лишние.
+  Числа каждый раз разные, так что считай в коде: pay = coins - need
+  создаст переменную pay с разностью, а hero.say(pay) скажет её сторожу.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "B": bag
+    "S": note
+    "D": guard
+    "F": flag
+  grid: |
+    #########
+    #@.B.####
+    ###.#####
+    #.S.#####
+    #.#######
+    #...DF###
+    #########
+
+objects:
+  bag:
+    pickable: true
+    gives: [7, 8, 9, 10, 11, 12]
+    icon: sack
+  note:
+    pickable: true
+    gives: [2, 3, 4, 5]
+    icon: scroll
+  guard:
+    password:
+      subtract: [bag, note]
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.take
+  - hero.say
+
+starter: |
+  # В мешке число монет — сохрани его: coins = hero.take()
+  hero.move_right(2)
+  coins = hero.take()
+
+solution: |
+  hero.move_right(2)
+  coins = hero.take()
+  hero.move_down(2)
+  hero.move_left()
+  need = hero.take()
+  hero.move_left()
+  hero.move_down(2)
+  hero.move_right(2)
+  pay = coins - need
+  hero.say(pay)
+  hero.move_right(2)
+
+goals:
+  - reach: [5, 5]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Два числа — две переменные: coins с мешка, need со свитка. В панели
+      «Переменные» видно оба. Сторожу нужна их разность: сколько монет
+      останется, если из coins забрать need.
+  - after_fails: 2
+    text: >-
+      Разность считается знаком «минус»: pay = coins - need. Число нельзя
+      написать самому — оно каждый раз новое. И говорить надо переменную,
+      без кавычек: hero.say(pay).
+  - after_fails: 4
+    text: >-
+      Два вправо, coins = hero.take(), два вниз, влево, need = hero.take(),
+      влево, два вниз, два вправо, pay = coins - need, hero.say(pay),
+      два вправо.

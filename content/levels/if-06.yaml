@@ -1,0 +1,83 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-06
+lesson: 2
+title: Перекрёсток
+brief: >-
+  Шаг вперёд — и герой на перекрёстке: выходы вверх, вправо и вниз, но
+  два из трёх завалены камнями, и какой открыт — каждый раз по-разному.
+  Все три дороги ведут к одному флагу. Напиши три проверки подряд, без
+  else: if hero.can_move("up"): и под ней вся верхняя дорога, потом if
+  hero.can_move("right"): и прямая дорога, потом if hero.can_move("down"):
+  и нижняя. Сработает ровно одна — та, где выход открыт.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "R": rubble
+    "F": flag
+  grid: |
+    ##########
+    ##.....###
+    ##R###.###
+    #@.R...F##
+    ##R###.###
+    ##.....###
+    ##########
+
+objects:
+  rubble:
+    blocking: true
+    present:
+      count: 2
+
+api:
+  - hero.move_right
+  - hero.move_up
+  - hero.move_down
+  - hero.can_move
+
+starter: |
+  # Три выхода, открыт один. Проверь каждый
+  hero.move_right()
+  if hero.can_move("up"):
+      hero.move_up(2)
+
+solution: |
+  hero.move_right()
+  if hero.can_move("up"):
+      hero.move_up(2)
+      hero.move_right(4)
+      hero.move_down(2)
+      hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(5)
+  if hero.can_move("down"):
+      hero.move_down(2)
+      hero.move_right(4)
+      hero.move_up(2)
+      hero.move_right()
+
+goals:
+  - reach: [7, 3]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Верхняя дорога: два вверх, четыре вправо, два вниз, один вправо.
+      Прямая: пять вправо. Нижняя — как верхняя, только вниз и вверх
+      наоборот. Каждая — под своим if.
+  - after_fails: 2
+    text: >-
+      Проверки идут подряд, а не одна в другой: каждый if начинается с
+      начала строки. Дорога под ним должна доводить до самого флага —
+      иначе следующая проверка застанет героя не там.
+  - after_fails: 4
+    text: >-
+      Шаг вправо. if hero.can_move("up"): вверх 2, вправо 4, вниз 2,
+      вправо 1. if hero.can_move("right"): вправо 5. if
+      hero.can_move("down"): вниз 2, вправо 4, вверх 2, вправо 1.

@@ -1,0 +1,84 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: var-02
+lesson: 3
+title: Свиток
+brief: >-
+  Коридор петляет, и на полу лежит свиток. На нём — пароль от двери в
+  конце пути, и каждый раз он другой: заранее его не узнать, только
+  прочитать. hero.take() на свитке не просто поднимает его, а возвращает
+  написанное слово. Сохрани его в переменную: password = hero.take().
+  Потом дойди до двери и скажи слово из переменной: hero.say(password).
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "S": scroll
+    "D": door
+    "F": flag
+  grid: |
+    ########
+    #@..####
+    ###.####
+    #.S.####
+    #.######
+    #...DF##
+    ########
+
+objects:
+  door:
+    password:
+      - сезам
+      - фонарь
+      - ключ
+      - дракон
+  scroll:
+    pickable: true
+    reveals: door
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.take
+  - hero.say
+
+starter: |
+  # hero.take() на свитке вернёт слово — сохрани его: password = hero.take()
+  hero.move_right(2)
+  hero.move_down(2)
+
+solution: |
+  hero.move_right(2)
+  hero.move_down(2)
+  hero.move_left()
+  password = hero.take()
+  hero.move_left()
+  hero.move_down(2)
+  hero.move_right(2)
+  hero.say(password)
+  hero.move_right(2)
+
+goals:
+  - reach: [5, 5]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Слово со свитка нельзя написать в кавычках — оно каждый раз новое.
+      Встань на свиток и напиши password = hero.take(): в переменную
+      попадёт то, что на нём написано. В панели «Переменные» это видно.
+  - after_fails: 2
+    text: >-
+      Порядок важен: сначала взять свиток, потом идти к двери, и говорить
+      надо вплотную к ней. Если написать hero.take() без «password =»,
+      слово прочитается и потеряется — сохранить его некуда.
+  - after_fails: 4
+    text: >-
+      Два вправо, два вниз, один влево, password = hero.take(), один влево,
+      два вниз, два вправо, hero.say(password), два вправо.

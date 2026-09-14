@@ -1,0 +1,80 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-05
+lesson: 2
+title: Обвал
+brief: >-
+  Прямой коридор к флагу, но в нём случается обвал: при запуске камни
+  лежат либо в коридоре, либо у входа в обход — где именно, заранее не
+  узнать. Обход идёт понизу, через яму. Дойди до развилки и спроси
+  героя, можно ли шагнуть вправо. Если да — иди прямо. Иначе — под else
+  напиши весь обход: вниз, прыжок вправо, вверх. Под if и под else может
+  стоять сколько угодно строк, лишь бы с одинаковым отступом. Обе дороги
+  сходятся в одной клетке, дальше путь общий.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "R": rubble
+    "P": pit
+    "F": flag
+  grid: |
+    ############
+    #@....R...F#
+    #####RP.####
+    ############
+
+objects:
+  rubble:
+    blocking: true
+    present:
+      count: 1
+  pit:
+    jumpable: true
+
+api:
+  - hero.move_right
+  - hero.move_up
+  - hero.move_down
+  - hero.can_move
+  - hero.jump
+
+starter: |
+  # Обвал либо в коридоре, либо на входе в обход — спроси героя
+  hero.move_right(4)
+  if hero.can_move("right"):
+      hero.move_right(2)
+
+solution: |
+  hero.move_right(4)
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.move_down()
+      hero.jump("right")
+      hero.move_up()
+  hero.move_right(3)
+
+goals:
+  - reach: [10, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Развилка — клетка перед камнями, четыре шага от старта. Оттуда
+      вправо две клетки до места, где обход возвращается в коридор, и
+      обход тоже кончается там же. После if и else — ещё три шага до флага.
+  - after_fails: 2
+    text: >-
+      Под else — три строки с одинаковым отступом: hero.move_down(),
+      hero.jump("right"), hero.move_up(). Прыгать надо из нижнего
+      коридора: яма — справа от клетки под развилкой.
+  - after_fails: 4
+    text: >-
+      hero.move_right(4). if hero.can_move("right"): hero.move_right(2).
+      else: hero.move_down(), hero.jump("right"), hero.move_up(). Потом
+      hero.move_right(3).

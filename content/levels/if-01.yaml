@@ -1,0 +1,84 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-01
+lesson: 2
+title: Фальшивые монеты
+brief: >-
+  В коридоре на каждой клетке лежит монета, но две из них фальшивые —
+  а с виду все одинаковые, и при каждом запуске подделки разные.
+  Фальшивка отнимает половину жизни. Новая команда hero.check_coin()
+  отвечает True, если монета под ногами настоящая, и False, если нет.
+  Бери монету только после проверки: напиши if hero.check_coin(): и
+  hero.take() строкой ниже с отступом. Собери все настоящие и дойди
+  до флага.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "o": coin
+    "F": flag
+  grid: |
+    #########
+    #@oooooF#
+    #########
+
+objects:
+  coin:
+    pickable: true
+    fake:
+      count: 2
+      damage: 10
+
+api:
+  - hero.move_right
+  - hero.check_coin
+  - hero.take
+
+starter: |
+  # Сначала проверь, потом бери
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+
+solution: |
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+  hero.move_right()
+  if hero.check_coin():
+      hero.take()
+  hero.move_right()
+
+goals:
+  - reach: [7, 1]
+  - collect: coin
+  - stay_alive: true
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Фальшивки каждый раз на новых местах, так что запомнить их не
+      выйдет. Проверяй каждую монету: после шага — hero.check_coin(),
+      и только если ответ True — hero.take().
+  - after_fails: 2
+    text: >-
+      Строка hero.take() должна стоять под if с отступом в четыре
+      пробела и после двоеточия. Без отступа герой возьмёт монету в любом
+      случае — и фальшивую тоже.
+  - after_fails: 4
+    text: >-
+      Пять раз подряд: шаг вправо, потом if hero.check_coin(): и под ним
+      с отступом hero.take(). В конце ещё один шаг вправо — к флагу.

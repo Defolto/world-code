@@ -23,7 +23,7 @@ import sys
 import traceback
 from typing import Any
 
-from simulator.errors import BudgetExceeded, humanize
+from simulator.errors import BudgetExceeded, HeroDied, humanize
 from simulator.world import Hero, World
 
 VERSION = 1
@@ -180,8 +180,9 @@ def run(
     """Прогнать код ученика на уровне и вернуть лог кадров."""
     loadout = loadout if loadout is not None else EMPTY_LOADOUT
     recorder = Recorder()
-    world = World(level, loadout, recorder.on_event)
+    world = World(level, loadout, recorder.on_event, seed)
     recorder.world = world
+    initial = world.snapshot()
     hero = Hero(world, level.get("api", []))
 
     error: dict[str, Any] | None = None
@@ -206,6 +207,9 @@ def run(
             error = _describe(exc)
             error["line"] = recorder.current_line()
             status, reason = "timeout", "budget"
+        except HeroDied:
+            # Не ошибка кода, а исход: строки после смерти не выполняются
+            status, reason = "lose", "died"
         except Exception as exc:
             # Любая ошибка ученика — не падение симулятора, а исход прогона
             error = _describe(exc)
@@ -225,6 +229,9 @@ def run(
         "level": level["id"],
         "seed": seed,
         "loadout": loadout,
+        # Мир до первой команды: рендеру нужно знать, каких случайных
+        # преград в этом прогоне нет, ещё до первого кадра с миром
+        "initial": initial,
         "outcome": {"status": status, "reason": reason},
         "metrics": _metrics(tree, recorder),
         "checksum": hashlib.sha256(_canonical(frames).encode("utf-8")).hexdigest(),

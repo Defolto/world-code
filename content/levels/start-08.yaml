@@ -1,0 +1,71 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: start-08
+lesson: 1
+title: Монетка
+brief: >-
+  На полу лежит монетка. Чтобы её поднять, нужно встать на неё и
+  написать hero.take(). Без монетки флаг не засчитают: дойди, возьми,
+  а потом спускайся к флагу.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "o": coin
+    "F": flag
+  grid: |
+    ######
+    #@...#
+    ####.#
+    #o...#
+    #F####
+    ######
+
+objects:
+  coin:
+    pickable: true
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.take
+
+starter: |
+  # Дорога к монетке идёт через правый край
+  hero.move_right()
+
+solution: |
+  hero.move_right()
+  hero.move_right()
+  hero.move_right()
+  hero.move_down()
+  hero.move_down()
+  hero.move_left()
+  hero.move_left()
+  hero.move_left()
+  hero.take()
+  hero.move_down()
+
+goals:
+  - reach: [1, 4]
+  - collect: coin
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      hero.take() работает только на той клетке, где лежит монетка.
+      Сначала встань на неё, потом бери.
+  - after_fails: 2
+    text: >-
+      Дошёл до флага, а уровень не пройден? Значит, монетка осталась
+      на полу. Проверь, что hero.take() стоит после шага на неё.
+  - after_fails: 4
+    text: >-
+      Три раза вправо, два раза вниз, три раза влево, hero.take(),
+      один раз вниз.

@@ -1,0 +1,80 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-03
+lesson: 2
+title: То ли яма, то ли нет
+brief: >-
+  Яма и паутина на этом пути бывают не всегда: при каждом запуске каждая
+  из них то на месте, то нет — заранее не узнать. Зато герой умеет
+  спрашивать: hero.can_move("right") отвечает True, если вправо можно
+  шагнуть, и False, если там преграда. Тот же кусок с if и else, что на
+  прошлом уровне, здесь единственный способ пройти: герой сам решит,
+  идти ему две клетки или прыгать. С паутиной так же, только проползти.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "P": pit
+    "W": web
+    "F": flag
+  grid: |
+    ###########
+    #@.P..W..F#
+    ###########
+
+objects:
+  pit:
+    jumpable: true
+    chance: 0.5
+  web:
+    crawlable: true
+    chance: 0.5
+
+api:
+  - hero.move_right
+  - hero.can_move
+  - hero.jump
+  - hero.crawl
+
+starter: |
+  # Преграда есть не всегда — спроси героя
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+
+solution: |
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.jump("right")
+  hero.move_right()
+  if hero.can_move("right"):
+      hero.move_right(2)
+  else:
+      hero.crawl("right")
+  hero.move_right(2)
+
+goals:
+  - reach: [9, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Если ямы нет, на её месте пол — две клетки, которые надо просто
+      пройти: hero.move_right(2). Если есть — перепрыгнуть. Оба случая
+      заканчиваются на одной и той же клетке.
+  - after_fails: 2
+    text: >-
+      else: пишется без условия, на том же уровне, что и if, и тоже с
+      двоеточием. Под ним, с отступом, — команда на случай, когда ответ
+      был False.
+  - after_fails: 4
+    text: >-
+      Шаг вправо. if hero.can_move("right"): два шага, else: jump("right").
+      Шаг вправо. if hero.can_move("right"): два шага, else: crawl("right").
+      Два шага вправо — до флага.

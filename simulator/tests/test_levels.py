@@ -14,20 +14,26 @@ from tools.level_schema import STRIPPED, level_paths, load_level
 
 LEVELS = level_paths()
 
+# Уровни со случайностью (подделки) должны проходиться эталоном на любом
+# seed; детерминированным лишние прогоны не мешают
+SEEDS = range(12)
+
 
 @pytest.mark.parametrize("path", LEVELS, ids=[p.stem for p in LEVELS])
 def test_solution_wins(path):
     level = load_level(path)
-    log = run(level.solution, level.model_dump(mode="json"))
-    assert log["outcome"]["status"] == "win", log["error"]
+    for seed in SEEDS:
+        log = run(level.solution, level.model_dump(mode="json"), seed=seed)
+        assert log["outcome"]["status"] == "win", (seed, log["outcome"], log["error"])
 
 
 @pytest.mark.parametrize("path", LEVELS, ids=[p.stem for p in LEVELS])
 def test_starter_does_not_win(path):
     """Заготовка — приглашение писать, а не готовый ответ."""
     level = load_level(path)
-    log = run(level.starter, level.model_dump(mode="json"))
-    assert log["outcome"]["status"] != "win"
+    for seed in SEEDS:
+        log = run(level.starter, level.model_dump(mode="json"), seed=seed)
+        assert log["outcome"]["status"] != "win", seed
 
 
 @pytest.mark.parametrize("path", LEVELS, ids=[p.stem for p in LEVELS])

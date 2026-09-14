@@ -1,0 +1,85 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: var-05
+lesson: 3
+title: Два мешка
+brief: >-
+  В коридоре два мешка с монетами, а унести можно только один — второй
+  в руки не влезет. Сторож у двери пропускает того, кто принёс больше:
+  ему надо сказать число монет в самом тяжёлом мешке. Не поднимая,
+  посмотри: hero.look() возвращает число монет в мешке под ногами.
+  Посмотри в оба, сравни знаком «больше»: if first > second: — и
+  подбери тот, где больше. В каждой ветке доведи героя до сторожа.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "B": bag
+    "D": guard
+    "F": flag
+  grid: |
+    ##########
+    #@.B.B.DF#
+    ##########
+
+objects:
+  bag:
+    pickable: true
+    gives: [5, 6, 7, 8, 9, 10, 11, 12]
+    icon: sack
+    heavy: true
+  guard:
+    password:
+      max: bag
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.look
+  - hero.take
+  - hero.say
+
+starter: |
+  # hero.look() скажет, сколько монет в мешке, не поднимая его
+  hero.move_right(2)
+  first = hero.look()
+
+solution: |
+  hero.move_right(2)
+  first = hero.look()
+  hero.move_right(2)
+  second = hero.look()
+  if first > second:
+      hero.move_left(2)
+      coins = hero.take()
+      hero.move_right(3)
+  else:
+      coins = hero.take()
+      hero.move_right()
+  hero.say(coins)
+  hero.move_right(2)
+
+goals:
+  - reach: [8, 1]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Сначала посмотри в оба мешка: first = hero.look() на первом, второй —
+      два шага дальше — second = hero.look(). Оба числа появятся в панели
+      «Переменные». Только потом решай, какой брать.
+  - after_fails: 2
+    text: >-
+      if first > second: — если в первом больше, вернись на два шага и
+      возьми его: coins = hero.take(), потом три шага вправо к сторожу.
+      else: — бери второй, где стоишь, и шаг вправо. Второй мешок после
+      первого не поднимется — руки заняты.
+  - after_fails: 4
+    text: >-
+      Два вправо, first = hero.look(), два вправо, second = hero.look().
+      if first > second: два влево, coins = hero.take(), три вправо.
+      else: coins = hero.take(), один вправо. hero.say(coins), два вправо.

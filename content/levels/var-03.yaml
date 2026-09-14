@@ -1,0 +1,93 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: var-03
+lesson: 3
+title: Пустой свиток
+brief: >-
+  По дороге два свитка, но пароль написан только на одном, а второй
+  пустой — и какой из них какой, каждый раз по-разному. hero.take() на
+  пустом свитке возвращает пустое слово: "" — две кавычки, между
+  которыми ничего нет. Возьми оба свитка в две переменные, first и
+  second. У двери проверь: if first == "": — это значит «если в first
+  пустое слово» (два знака «равно» подряд — сравнение). Тогда говори
+  second, иначе (else) — first.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "S": scroll
+    "D": door
+    "F": flag
+  grid: |
+    #########
+    #@.S.####
+    ###.#####
+    #.S.#####
+    #.#######
+    #...DF###
+    #########
+
+objects:
+  door:
+    password:
+      - сезам
+      - фонарь
+      - ключ
+      - дракон
+  scroll:
+    pickable: true
+    reveals: door
+    blank:
+      count: 1
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.take
+  - hero.say
+
+starter: |
+  # Один из свитков пустой: hero.take() вернёт "" — пустое слово
+  hero.move_right(2)
+  first = hero.take()
+
+solution: |
+  hero.move_right(2)
+  first = hero.take()
+  hero.move_down(2)
+  hero.move_left()
+  second = hero.take()
+  hero.move_left()
+  hero.move_down(2)
+  hero.move_right(2)
+  if first == "":
+      hero.say(second)
+  else:
+      hero.say(first)
+  hero.move_right(2)
+
+goals:
+  - reach: [5, 5]
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Сначала собери оба слова: first = hero.take() на первом свитке,
+      second = hero.take() на втором. В панели «Переменные» будет видно,
+      в какой из них пусто. Решать, что сказать, надо у самой двери.
+  - after_fails: 2
+    text: >-
+      Сравнение пишется двумя знаками «равно»: if first == "": — с одним
+      знаком получится не проверка, а запись в переменную. Пустое слово —
+      две кавычки подряд без пробела между ними.
+  - after_fails: 4
+    text: >-
+      Два вправо, first = hero.take(), два вниз, влево, second =
+      hero.take(), влево, два вниз, два вправо. if first == "": под ним
+      hero.say(second), else: под ним hero.say(first). Два вправо.

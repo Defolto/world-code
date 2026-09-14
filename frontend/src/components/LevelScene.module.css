@@ -3,6 +3,10 @@
 .svg {
   display: block;
   overflow: hidden;
+  /* Глобальное svg { max-width: 100% } здесь вредно: сцена обязана быть
+     ровно DISPLAY_CELL на клетку, а масштаб делает камера. Иначе длинная
+     карта ужимается под окно, и камера центрирует не то, что нарисовано */
+  max-width: none;
 }
 
 .mark {
@@ -13,6 +17,226 @@
   rx: 4;
 }
 
+/* Предметы. Поднятый взлетает и тает — плеер ставит data-state="taken"
+   на кадре с событием pickup, переход рисует CSS */
+.item {
+  transition:
+    translate 320ms ease-out,
+    opacity 320ms ease-out;
+}
+
+/* Свойство translate, а не transform: transform из CSS перекрыл бы
+   атрибут transform с позицией клетки */
+.item[data-state="taken"] {
+  opacity: 0;
+  translate: 0 -22px;
+}
+
+.itemShadow {
+  fill: color-mix(in srgb, var(--void) 25%, transparent);
+}
+
+.coin {
+  fill: var(--gold);
+  stroke: color-mix(in srgb, var(--gold) 55%, #7a4b00);
+  stroke-width: 2;
+}
+
+.coinInner {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gold) 60%, #7a4b00);
+  stroke-width: 1.5;
+}
+
+.coinShine {
+  fill: none;
+  stroke: #fff4c2;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* Свиток: лист пергамента между двумя валиками, строчки — «тут написано» */
+.scrollSheet {
+  fill: #f1e4c3;
+  stroke: #9c7a45;
+  stroke-width: 1.2;
+}
+
+.scrollRoll {
+  fill: #d9c391;
+  stroke: #9c7a45;
+  stroke-width: 1.2;
+}
+
+.scrollInk {
+  stroke: #6b4f2a;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+/* Мешок: кожаный кисет с завязкой */
+.sack {
+  fill: #a9713b;
+  stroke: #5a3716;
+  stroke-width: 1.3;
+  stroke-linejoin: round;
+}
+
+.sackTie,
+.sackFold {
+  fill: none;
+  stroke: #5a3716;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+
+/* Результат hero.check_coin(): подделка становится ядовито-зелёной,
+   настоящая — с галочкой в углу. Атрибут ставит плеер по снимку */
+.coin,
+.coinInner,
+.coinShine {
+  transition:
+    fill 260ms ease-out,
+    stroke 260ms ease-out;
+}
+
+.item[data-check="fake"] .coin {
+  fill: #7fd63a;
+  stroke: #2f6b0d;
+}
+
+.item[data-check="fake"] .coinInner {
+  stroke: #3f8a12;
+}
+
+.item[data-check="fake"] .coinShine {
+  stroke: #d8ffb0;
+}
+
+.checkBadge {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.checkBadge circle {
+  fill: var(--bg-elev);
+  stroke-width: 1.5;
+}
+
+.checkBadge path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: none;
+}
+
+.item[data-check] .checkBadge {
+  opacity: 1;
+}
+
+.item[data-check="real"] .checkBadge circle {
+  stroke: var(--emerald);
+}
+
+.item[data-check="real"] .checkReal {
+  display: block;
+  stroke: var(--emerald);
+}
+
+.item[data-check="fake"] .checkBadge circle {
+  stroke: var(--crimson);
+}
+
+.item[data-check="fake"] .checkFake {
+  display: block;
+  stroke: var(--crimson);
+}
+
+/* Маршрут прогона. Элементы создаёт плеер (scene/levelPlayer.ts, drawRoute),
+   отличаются data-атрибутами: план, пройденное, тычок в стену, остановка */
+.route path {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* План: тёмный на светлом полу, штрихи бегут в сторону движения —
+   видно, что это маршрут, а не разметка пола */
+.route [data-plan] {
+  stroke: color-mix(in srgb, var(--tile) 60%, transparent);
+  stroke-dasharray: 8 7;
+  animation: route-march 0.9s linear infinite;
+}
+
+@keyframes route-march {
+  to {
+    stroke-dashoffset: -15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route [data-plan] {
+    animation: none;
+  }
+}
+
+.route [data-done] {
+  stroke: var(--emerald);
+}
+
+.route [data-bump] line {
+  stroke: var(--crimson);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.route [data-wait] circle {
+  fill: var(--bg-elev);
+  stroke: var(--steel);
+  stroke-width: 1.5;
+}
+
+.route [data-wait] text {
+  fill: var(--ink);
+  font: 700 10px var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Куда герой посмотрел (can_move) и что увидел */
+.route [data-look] circle {
+  fill: var(--bg-elev);
+  stroke-width: 1.5;
+}
+
+.route [data-look] text {
+  font: 700 11px var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.route [data-look="yes"] circle,
+.route [data-look="yes"] text {
+  stroke: var(--emerald);
+  fill: var(--emerald);
+}
+
+.route [data-look="yes"] circle {
+  fill: var(--bg-elev);
+}
+
+.route [data-look="no"] circle,
+.route [data-look="no"] text {
+  stroke: var(--crimson);
+  fill: var(--crimson);
+}
+
+.route [data-look="no"] circle {
+  fill: var(--bg-elev);
+}
+
 .flagPole {
   stroke: var(--steel);
   stroke-width: 2;
@@ -21,6 +245,55 @@
 
 .flagCloth {
   fill: var(--gold);
+}
+
+/* Преграды. Отсутствующая в этом прогоне — тает: плеер ставит
+   data-state="absent" по initial лога ещё до первого шага */
+.obstacle {
+  transition: opacity 260ms ease-out;
+}
+
+.obstacle[data-state="absent"] {
+  opacity: 0;
+}
+
+.pitRim {
+  fill: color-mix(in srgb, var(--tile) 55%, #0c1016);
+}
+
+.pit {
+  fill: #0c1016;
+}
+
+.pitDeep {
+  fill: #000;
+  opacity: 0.55;
+}
+
+.web line,
+.web path {
+  fill: none;
+  stroke: #e6ebf0;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+.webHub {
+  fill: #e6ebf0;
+  opacity: 0.9;
+}
+
+/* Завал — те же камни, что на скале (Tiles.module.css), цвета продублированы:
+   переменные там заданы на .tiles и сюда не достают */
+.rubbleStone {
+  fill: #313c48;
+  stroke: #1c232b;
+  stroke-width: 1.2;
+}
+
+.rubbleLight {
+  fill: #46525f;
 }
 
 /* Ворота: решётка ездит вверх-вниз по CSS-переходу, состояние — data-state
@@ -55,4 +328,60 @@
   font: 700 10px var(--mono);
   text-anchor: middle;
   dominant-baseline: central;
+}
+
+/* Замок на запертых воротах: открытые — зелёный, как и кружок */
+.lock path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+
+.lock rect {
+  fill: var(--ink);
+}
+
+[data-state="open"] .lock path,
+[data-state="open"] .lock rect {
+  stroke: var(--emerald);
+  fill: var(--emerald);
+}
+
+[data-state="open"] .lock path {
+  fill: none;
+  /* Дужка открытого замка откинута */
+  transform: translateX(3px) scaleX(-1);
+  transform-origin: 0 -1px;
+}
+
+/* Пузырь речи над героем: скруглённый прямоугольник с хвостиком, ширину
+   по тексту ставит плеер */
+.bubbleBox {
+  fill: var(--bg-elev);
+  stroke: var(--steel);
+  stroke-width: 1.5;
+}
+
+.bubbleTail {
+  fill: var(--bg-elev);
+  stroke: var(--steel);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.bubbleText {
+  fill: var(--ink);
+  font: 700 11px var(--mono);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Мысль (hero.look): пунктирный контур, серый текст — увидел, а не сказал */
+[data-thought] .bubbleBox,
+[data-thought] .bubbleTail {
+  stroke-dasharray: 3 2.5;
+}
+
+[data-thought] .bubbleText {
+  fill: var(--ink-dim);
 }

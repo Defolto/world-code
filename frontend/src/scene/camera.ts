@@ -8,6 +8,18 @@
 // Сцена внутри обёртки рисуется в своём естественном размере (DISPLAY_CELL
 // на клетку), а камера двигает и масштабирует обёртку целиком. Плеер про
 // камеру не знает: координаты героя — в единицах сцены.
+//
+// Сцена — это карта плюс кольцо скалы вокруг. По умолчанию камера
+// показывает карту: длинный коридор с кольцом в окно не влезает, и герой
+// на левом краю оказывался за экраном. Кольцо — запас, а не содержимое.
+
+/** Прямоугольник в координатах сцены (px при масштабе 1) */
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 const MIN_SCALE = 0.25;
 const MAX_SCALE = 4;
@@ -32,6 +44,8 @@ export class Camera {
     private readonly content: HTMLElement,
     private readonly width: number,
     private readonly height: number,
+    /** Сама карта без кольца — то, что должно быть видно по умолчанию */
+    private readonly map: Rect,
     private readonly onScale: (k: number) => void,
   ) {
     content.style.transformOrigin = "0 0";
@@ -57,28 +71,26 @@ export class Camera {
     return this.k;
   }
 
-  /** По умолчанию: естественный размер (100%), поле по центру. Если сцена
-   *  с кольцом скалы не влезает — не страшно, кольцо и есть запас */
+  /** По умолчанию: карта целиком по центру, не крупнее естественного
+   *  размера (100%). Кольцо скалы вокруг пусть обрезается — это запас */
   reset() {
-    this.setCentered(1);
+    this.setCentered(this.map);
     this.touched = false;
   }
 
-  /** Поле целиком по центру, не крупнее естественного размера */
+  /** Сцена целиком, с кольцом, по центру — кнопка «показать всё поле» */
   fit() {
-    const r = this.viewport.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) return;
-    const k = Math.min(1, (r.width - FIT_PAD * 2) / this.width, (r.height - FIT_PAD * 2) / this.height);
-    this.setCentered(k);
+    this.setCentered({ x: 0, y: 0, width: this.width, height: this.height });
     this.touched = true;
   }
 
-  private setCentered(k: number) {
+  /** Вписать прямоугольник сцены в окно (не крупнее 1) и поставить его в центр */
+  private setCentered(rect: Rect) {
     const r = this.viewport.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) return;
-    this.k = clamp(k);
-    this.x = (r.width - this.width * this.k) / 2;
-    this.y = (r.height - this.height * this.k) / 2;
+    this.k = clamp(Math.min(1, (r.width - FIT_PAD * 2) / rect.width, (r.height - FIT_PAD * 2) / rect.height));
+    this.x = (r.width - rect.width * this.k) / 2 - rect.x * this.k;
+    this.y = (r.height - rect.height * this.k) / 2 - rect.y * this.k;
     this.apply();
   }
 

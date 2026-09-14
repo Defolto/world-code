@@ -1,0 +1,115 @@
+# Координаты: [x, y], начало в левом верхнем углу, y растёт вниз.
+id: if-04
+lesson: 2
+title: Два тайника
+brief: >-
+  Длинный коридор, и от него два ответвления: вверх и вниз. В каждом —
+  ворота, за ними преграда, за преградой монета. Одна из двух монет
+  фальшивая, и какая — неизвестно: проверяй обе, бери только настоящую.
+  Ворота открываются, если постоять рядом: hero.wait() столько раз,
+  сколько написано на решётке. Яму и паутину проходят hero.jump("up") и
+  hero.crawl("down") — направление любое из четырёх, назад тоже. Клетки
+  считай и пиши число в скобках: hero.move_right(5). В конце — флаг.
+
+map:
+  legend:
+    "#": wall
+    ".": floor
+    "@": hero
+    "|": gate
+    ":": heavy_gate
+    "P": pit
+    "W": web
+    "o": coin
+    "F": flag
+  grid: |
+    ##############
+    ###o##########
+    ###P##########
+    ###|##########
+    #@..........F#
+    ########:#####
+    ########W#####
+    ########o#####
+    ##############
+
+objects:
+  gate:
+    waits_to_open: 2
+  heavy_gate:
+    waits_to_open: 3
+  pit:
+    jumpable: true
+  web:
+    crawlable: true
+  coin:
+    pickable: true
+    fake:
+      count: 1
+      damage: 10
+
+api:
+  - hero.move_right
+  - hero.move_left
+  - hero.move_up
+  - hero.move_down
+  - hero.wait
+  - hero.jump
+  - hero.crawl
+  - hero.check_coin
+  - hero.take
+
+starter: |
+  # До первых ворот две клетки; рядом с ними постой, пока не откроются
+  hero.move_right(2)
+  hero.wait()
+  hero.wait()
+
+solution: |
+  hero.move_right(2)
+  hero.wait()
+  hero.wait()
+  hero.move_up()
+  hero.jump("up")
+  if hero.check_coin():
+      hero.take()
+  hero.jump("down")
+  hero.move_down()
+  hero.move_right(5)
+  hero.wait()
+  hero.wait()
+  hero.wait()
+  hero.move_down()
+  hero.crawl("down")
+  if hero.check_coin():
+      hero.take()
+  hero.crawl("up")
+  hero.move_up()
+  hero.move_right(4)
+
+goals:
+  - reach: [12, 4]
+  - collect: coin
+  - stay_alive: true
+
+medals:
+  short: auto
+
+hints:
+  - after_fails: 1
+    text: >-
+      Разбей путь на куски: до ворот — постоять — шаг в проход — через
+      преграду — проверить и взять — обратно через преграду — в коридор —
+      дальше. Ответвление вверх через яму, ответвление вниз через паутину.
+  - after_fails: 2
+    text: >-
+      Ворота считают только hero.wait() подряд: любой шаг сбивает счёт,
+      так что сначала подойди, потом стой. Из тайника назад — та же
+      команда с обратным направлением: jump("down") после jump("up"),
+      crawl("up") после crawl("down"). И монету бери только после
+      hero.check_coin().
+  - after_fails: 4
+    text: >-
+      Два вправо, два wait, вверх, jump("up"), if check_coin — take,
+      jump("down"), вниз, пять вправо, три wait, вниз, crawl("down"),
+      if check_coin — take, crawl("up"), вверх, четыре вправо.

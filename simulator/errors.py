@@ -20,6 +20,11 @@ class HeroCommandError(AttributeError):
     """Обращение к команде, которой у героя нет (или ещё нет)."""
 
 
+class HeroDied(BaseException):
+    """Герой погиб — прогон окончен. BaseException по той же причине,
+    что и BudgetExceeded: `except Exception:` ученика не должен воскрешать."""
+
+
 HUMAN = {
     "SyntaxError": "Python не понял эту строку. Проверь скобки, двоеточия и кавычки.",
     "IndentationError": "Отступы не сходятся. Строки внутри одного блока начинаются одинаково.",

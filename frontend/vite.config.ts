@@ -62,15 +62,19 @@ const levels: Plugin = {
     return `export default ${JSON.stringify(all)};`;
   },
   configureServer(server) {
-    // Правка YAML в деве — перезагрузка страницы, как правка исходника
+    // Правка, добавление или удаление YAML в деве — перезагрузка страницы,
+    // как правка исходника
     server.watcher.add(LEVELS_DIR);
-    server.watcher.on("change", (path) => {
+    const reload = (path: string) => {
       if (path.startsWith(LEVELS_DIR)) {
         const mod = server.moduleGraph.getModuleById(`\0${LEVELS_ID}`);
         if (mod) server.moduleGraph.invalidateModule(mod);
         server.ws.send({ type: "full-reload" });
       }
-    });
+    };
+    server.watcher.on("change", reload);
+    server.watcher.on("add", reload);
+    server.watcher.on("unlink", reload);
   },
 };
 
