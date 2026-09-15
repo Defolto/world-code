@@ -69,7 +69,13 @@ const PROCESSES = {
     ],
     // Сборки в деве может и не быть — тогда бэкенд просто не монтирует
     // статику, а /health честно покажет static_ready: false.
-    env: { STATIC_DIR: path.join(root, "frontend", "dist") },
+    env: {
+      STATIC_DIR: path.join(root, "frontend", "dist"),
+      // Прохождения уровней пишутся в backend/data (в .gitignore).
+      // Пароль к /stats/ в деве — «dev», если не задан свой.
+      DATA_DIR: path.join(root, "backend", "data"),
+      STATS_PASSWORD: process.env.STATS_PASSWORD ?? "dev",
+    },
     check() {
       if (!fs.existsSync(venvPython)) {
         return (

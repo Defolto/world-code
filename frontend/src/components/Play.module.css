@@ -105,6 +105,24 @@
   color: var(--emerald);
 }
 
+/* Пройденный уровень — залитый зелёный кружок; текущий и пройденный
+   отличается от просто пройденного кольцом вокруг */
+.levelPassed {
+  background: var(--emerald);
+  border-color: var(--emerald);
+  color: var(--bg, #fff);
+}
+
+.levelPassed:hover {
+  border-color: var(--emerald);
+  color: var(--bg, #fff);
+  filter: brightness(1.1);
+}
+
+.levelPassed.levelActive {
+  box-shadow: 0 0 0 2px var(--bg, #fff), 0 0 0 4px var(--emerald);
+}
+
 /* ─── Раскладка ─── */
 
 /* Поле слева, код справа. Высота поля задаётся правой колонкой: редактор

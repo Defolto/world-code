@@ -1,0 +1,335 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--gap-2) var(--edge) var(--gap-4);
+  gap: var(--gap-2);
+}
+
+/* ─── Шапка — как на странице урока ─── */
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  flex-wrap: wrap;
+}
+
+.back {
+  text-decoration: none;
+  color: var(--ink-dim);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.back:hover {
+  color: var(--ink);
+}
+
+.title {
+  font-size: 20px;
+  flex: 1;
+}
+
+.total {
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+
+.reload {
+  font: inherit;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.reload:hover {
+  border-color: var(--ink-faint);
+}
+
+.problem {
+  padding: var(--gap-2);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--crimson) 40%, transparent);
+  background: color-mix(in srgb, var(--crimson) 10%, transparent);
+}
+
+.muted {
+  color: var(--ink-dim);
+}
+
+/* Форма пароля — только в деве, на проде пароль спрашивает браузер */
+.login {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-1) var(--gap-2);
+  padding: var(--gap-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-elev);
+  max-width: 560px;
+}
+
+.login input {
+  font: inherit;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-sunken);
+  color: var(--ink);
+}
+
+/* ─── Сводная таблица ─── */
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-elev);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--line-soft);
+  white-space: nowrap;
+}
+
+.table th {
+  font-size: 11px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowClickable {
+  cursor: pointer;
+}
+
+.rowClickable:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.rowOpen {
+  background: color-mix(in srgb, var(--emerald) 6%, transparent);
+}
+
+/* Прежняя редакция уровня — приглушённо, под текущей */
+.rowOld td {
+  color: var(--ink-faint);
+  font-size: 13px;
+}
+
+.rowOld td:nth-child(2) {
+  padding-left: 28px;
+}
+
+.bad {
+  color: var(--crimson);
+}
+
+.levelId {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-right: 6px;
+}
+
+.verdict {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+
+.verdict_ok {
+  border-color: color-mix(in srgb, var(--emerald) 50%, transparent);
+  color: var(--emerald);
+}
+
+.verdict_easy {
+  border-color: color-mix(in srgb, var(--steel) 60%, transparent);
+  color: var(--steel);
+}
+
+.verdict_hard {
+  border-color: color-mix(in srgb, var(--crimson) 50%, transparent);
+  color: var(--crimson);
+  background: color-mix(in srgb, var(--crimson) 10%, transparent);
+}
+
+/* ─── Раскрытая строка: прохождения уровня ─── */
+
+.detailsRow td {
+  padding: 0;
+  background: var(--bg-sunken);
+  white-space: normal;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  padding: var(--gap-2);
+}
+
+.attempt {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-elev);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.attemptLeft {
+  border-color: color-mix(in srgb, var(--crimson) 35%, var(--line));
+}
+
+.attemptHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  font-size: 13px;
+  align-items: baseline;
+}
+
+.student {
+  font-family: var(--mono);
+  color: var(--gold);
+}
+
+/* Удаление — в правом краю шапки попытки */
+.removeBox {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.removeBtn {
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+
+.removeBtn:hover {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+
+.removeYes {
+  border-color: var(--crimson);
+  color: var(--crimson);
+}
+
+.removeYes:hover {
+  background: color-mix(in srgb, var(--crimson) 15%, transparent);
+  color: var(--crimson);
+}
+
+/* Лента запусков */
+.runs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.run {
+  font: inherit;
+  font-family: var(--mono);
+  font-size: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+
+.run_win {
+  border-color: var(--emerald);
+  color: var(--emerald);
+}
+
+.run_lose,
+.run_timeout {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.run_error {
+  border-color: var(--crimson);
+  color: var(--crimson);
+}
+
+.run_engine {
+  border-color: var(--steel);
+  color: var(--steel);
+  border-style: dashed;
+}
+
+.runActive {
+  box-shadow: 0 0 0 2px var(--bg-elev), 0 0 0 4px currentColor;
+}
+
+.runBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.runMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.error {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--crimson);
+}
+
+.code {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--line-soft);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+  tab-size: 4;
+}

@@ -37,6 +37,9 @@ content/_generated/
 # --- Артефакты деплоя ---
 release/
 
+# --- Данные локального бэкенда: прохождения уровней (см. dev.mjs) ---
+backend/data/
+
 # --- Логи ---
 *.log
 npm-debug.log*

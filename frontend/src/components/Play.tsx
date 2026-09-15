@@ -7,6 +7,7 @@ import { Camera } from "../scene/camera";
 import { DISPLAY_CELL, PAD } from "../scene/grid";
 import { LevelPlayer, SPEEDS, type SceneRefs, type Speed } from "../scene/levelPlayer";
 import { Editor, type EditorHandle } from "./Editor";
+import { newAttempt, reportLeft, reportPassed, type Attempt } from "../engine/attempts";
 import { CHARACTERS, CharacterFace, type CharacterId } from "./HeroSprite";
 import { LevelScene, parseMap, sceneSize } from "./LevelScene";
 import styles from "./Play.module.css";
@@ -117,6 +118,28 @@ function saveSpeed(speed: Speed) {
   }
 }
 
+// Пройденные уровни — пока в sessionStorage: аккаунтов и сервера нет, а
+// закрытая вкладка честно обнуляет прогресс. Хранилище может быть недоступно —
+// тогда ничего не помним.
+const PASSED_KEY = "mirkod.passed";
+
+function loadPassed(): Set<string> {
+  try {
+    const raw: unknown = JSON.parse(sessionStorage.getItem(PASSED_KEY) ?? "[]");
+    return new Set(Array.isArray(raw) ? raw.filter((x): x is string => typeof x === "string") : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function savePassed(passed: Set<string>) {
+  try {
+    sessionStorage.setItem(PASSED_KEY, JSON.stringify([...passed]));
+  } catch {
+    /* приватный режим или запрет хранилища — не страшно */
+  }
+}
+
 interface PlayProps {
   levelId: string;
 }
@@ -162,6 +185,10 @@ function PlayLevel({ level }: { level: Level }) {
   const [failure, setFailure] = useState<string | null>(null);
   const [character, setCharacter] = useState<CharacterId>(CHARACTERS[0]);
   const [zoom, setZoom] = useState(1);
+  const [passed, setPassed] = useState(loadPassed);
+  // Хроника прохождения для методиста: каждый запуск с кодом и исходом.
+  // Живёт в ref — интерфейсу она не нужна, уезжает на сервер при победе
+  const attempt = useRef<Attempt>(newAttempt(level));
 
   const refs = useCallback((): SceneRefs | null => {
     if (!scene.current || !hero.current || !body.current || !armFront.current || !armBack.current || !legFront.current || !legBack.current) {
@@ -274,9 +301,29 @@ function PlayLevel({ level }: { level: Level }) {
       // Каждый запуск — новый seed: подделки на уровнях с ними ложатся
       // по-новому, и выучить их наизусть нельзя. Прогон по seed
       // воспроизводим — он записан в логе
-      setLog(await runProgram(source, level, Math.floor(Math.random() * 2 ** 31)));
+      const result = await runProgram(source, level, Math.floor(Math.random() * 2 ** 31));
+      attempt.current.runs.push({
+        at: Date.now(),
+        code: source,
+        status: result.outcome.status,
+        reason: result.outcome.reason,
+        error: result.error,
+        seed: result.seed,
+        ticks: result.metrics.ticks,
+      });
+      setLog(result);
     } catch (err) {
-      setFailure(err instanceof Error ? err.message : String(err));
+      const message = err instanceof Error ? err.message : String(err);
+      attempt.current.runs.push({
+        at: Date.now(),
+        code: source,
+        status: "engine",
+        reason: message,
+        error: null,
+        seed: null,
+        ticks: null,
+      });
+      setFailure(message);
     } finally {
       setRunning(false);
     }
@@ -284,6 +331,29 @@ function PlayLevel({ level }: { level: Level }) {
 
   const atEnd = frame?.events.some((e) => e.type === "level_end") ?? false;
   const outcome = log && atEnd ? log.outcome.status : null;
+
+  // Уровень засчитан, когда плёнка дошла до победного конца — вместе с
+  // табличкой «Уровень пройден!», а не раньше неё
+  useEffect(() => {
+    if (outcome !== "win" || passed.has(level.id)) return;
+    const next = new Set(passed).add(level.id);
+    savePassed(next);
+    setPassed(next);
+  }, [outcome, passed, level.id]);
+
+  // Первая победа на этой странице — хроника уезжает методисту. Повторные
+  // запуски после победы уже ни о чём не говорят
+  useEffect(() => {
+    if (outcome === "win" && log) reportPassed(attempt.current, log);
+  }, [outcome, log]);
+
+  // Ушёл без победы — тоже уезжает: брошенный уровень важнее пройденного.
+  // pagehide, а не visibilitychange: переключение вкладки — ещё не уход
+  useEffect(() => {
+    const leave = () => reportLeft(attempt.current);
+    window.addEventListener("pagehide", leave);
+    return () => window.removeEventListener("pagehide", leave);
+  }, []);
   const vars = frame?.vars ? Object.entries(frame.vars) : [];
 
   return (
@@ -318,9 +388,15 @@ function PlayLevel({ level }: { level: Level }) {
             <a
               key={l.id}
               href={levelUrl(l.id)}
-              className={l.id === level.id ? `${styles.levelChip} ${styles.levelActive}` : styles.levelChip}
+              className={[
+                styles.levelChip,
+                l.id === level.id && styles.levelActive,
+                passed.has(l.id) && styles.levelPassed,
+              ]
+                .filter(Boolean)
+                .join(" ")}
               aria-current={l.id === level.id ? "page" : undefined}
-              title={l.title}
+              title={passed.has(l.id) ? `${l.title} · пройден` : l.title}
             >
               {i + 1}
             </a>

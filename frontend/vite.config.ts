@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
+import { createHash } from "node:crypto";
 import { copyFileSync, createReadStream, existsSync, mkdirSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,11 +9,12 @@ import { load as loadYaml } from "js-yaml";
 const FRONTEND = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(FRONTEND, "..");
 
-// Отдельные страницы: макеты дизайна (/maketN/) и игра (/play/).
+// Отдельные страницы: макеты дизайна (/maketN/), игра (/play/) и
+// статистика прохождений для методиста (/stats/, под паролем на сервере).
 // Лежат в <имя>/index.html, собираются в dist/<имя>/index.html — бэкенд
 // отдаёт их как обычную статику.
 const MAKETS = ["maket1", "maket2", "maket3", "maket4", "maket5"];
-const PAGES = [...MAKETS, "play"];
+const PAGES = [...MAKETS, "play", "stats"];
 
 // Без слеша на конце (/maket1) Vite молча отдал бы главную через SPA-fallback,
 // а на сервере Starlette в том же случае перенаправляет на /maket1/. Делаем
@@ -40,6 +42,11 @@ const trailingSlash: Plugin = {
 // продублирован в tools/level_schema.py (STRIPPED) — тест сверяет, что
 // они совпадают. Валидацию формата делает Pydantic в CI, здесь только
 // вырезка: две схемы на один YAML нам не нужны.
+//
+// `version` — хэш уровня после вырезки, то есть ровно того, что видит
+// ребёнок. Уезжает в статистику с каждой попыткой: правка карты или
+// заготовки меняет версию, и попытки «до» и «после» не смешиваются.
+// Правка `solution` или `hints` версию не трогает — детям её не видно.
 const LEVELS_DIR = join(REPO, "content", "levels");
 const STRIPPED = ["solution", "hints"];
 const LEVELS_ID = "virtual:levels";
@@ -57,6 +64,7 @@ const levels: Plugin = {
       this.addWatchFile(path);
       const level = loadYaml(readFileSync(path, "utf-8")) as Record<string, unknown>;
       for (const key of STRIPPED) delete level[key];
+      level.version = createHash("sha1").update(JSON.stringify(level)).digest("hex").slice(0, 8);
       all[level.id as string] = level;
     }
     return `export default ${JSON.stringify(all)};`;
@@ -150,6 +158,8 @@ export default defineConfig({
     proxy: {
       "/health": API,
       "/api": API,
+      // Данные статистики; сама страница /stats/ остаётся за Vite
+      "/stats/data": API,
     },
   },
   build: {

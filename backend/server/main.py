@@ -1,8 +1,9 @@
 """Минимальный ASGI-бэкенд «мирКода».
 
-Пока он умеет ровно две вещи: раздавать собранный фронтенд и отвечать на
-проверку живости. Ни базы, ни моделей, ни авторизации здесь ещё нет —
-они появятся, когда появится, что хранить.
+Умеет три вещи: раздавать собранный фронтенд, отвечать на проверку
+живости и принимать прохождения уровней (см. server/attempts.py). Базы
+и аккаунтов ещё нет — прохождения лежат в файле, а статистика по ним
+закрыта одним общим паролем.
 
 Почему Starlette. Выбор между FastAPI и Django мы отложили до момента,
 когда станет понятна тяжесть кабинета школы. Starlette — это фундамент,
@@ -17,10 +18,12 @@ import os
 from pathlib import Path
 
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 
+from server.attempts import PasswordGate, delete_attempt, list_attempts, record_attempt
 from server.static_files import BuiltAssets
 
 # Раскладку задаёт пресет Python ASGI на хостинге: код лежит в app/,
@@ -47,6 +50,10 @@ async def health(request: Request) -> JSONResponse:
 
 routes = [
     Route("/health", health),
+    Route("/api/attempts", record_attempt, methods=["POST"]),
+    # Под /stats/ — чтобы браузер слал пароль, спрошенный на странице
+    Route("/stats/data", list_attempts),
+    Route("/stats/data/{id}", delete_attempt, methods=["DELETE"]),
 ]
 
 # Монтируем последним: Mount на "/" перехватывает всё, что не разобрали выше.
@@ -54,4 +61,4 @@ routes = [
 if STATIC_DIR.is_dir():
     routes.append(Mount("/", app=BuiltAssets(directory=STATIC_DIR, html=True), name="static"))
 
-app = Starlette(routes=routes)
+app = Starlette(routes=routes, middleware=[Middleware(PasswordGate)])

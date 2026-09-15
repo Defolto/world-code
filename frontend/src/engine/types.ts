@@ -125,6 +125,9 @@ export interface FrameLog {
 /** Уровень, каким он приходит в браузер: без solution и hints */
 export interface Level {
   id: string;
+  /** Хэш содержимого, ставит сборка; по нему статистика различает
+   *  правки уровня */
+  version: string;
   lesson: number;
   title: string;
   brief: string;
